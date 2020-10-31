@@ -8,19 +8,15 @@ interface PeerOptions {
 }
 
 class Peer {
-    private readonly hostname: string;
-    private readonly port: number;
-    private readonly timestamp: number;
-    private visited = false;
+    public readonly hostname: string;
+    public readonly port: number;
+    public readonly timestamp: number;
+    public visited = false;
 
     public constructor(peerOptions: PeerOptions) {
         this.hostname = peerOptions.hostname;
         this.port = peerOptions.port;
         this.timestamp = peerOptions.timestamp;
-    }
-
-    public hasBeenVisited(): boolean {
-        return this.visited;
     }
 
     public visit(): void {

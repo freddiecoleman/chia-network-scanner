@@ -1,6 +1,7 @@
 import * as async from 'async';
 import { NetworkScannerOptions, parseOptions } from './options';
 import { Peer } from './peer';
+import { MessageChannel } from './MessageChannel';
 
 class ChiaNetworkScanner {
     private peers = new Map<string, Peer>();
@@ -44,14 +45,22 @@ class ChiaNetworkScanner {
         }
 
         // We only visit each peer once
-        if (peer.hasBeenVisited()) {
+        if (peer.visited) {
             return callback();
         }
 
         // Set to visited immediately to prevent async processing of the same peer
         peer.visit();
 
-        // Todo: Establish TCP connection
+        const messageChannel = new MessageChannel({
+            hostname: peer.hostname,
+            port: peer.port,
+            onMessage: (message, channel) => {
+
+
+                channel.close();
+            }
+        });
 
         // Todo: Perform application level handshake
 
