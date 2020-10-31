@@ -169,8 +169,10 @@ class PeerConnection {
      * @param message expected
      */
     private expectMessage(message: string): Promise<void> {
+        const { hostname, port, connectionTimeout } = this.messageChannel;
+
         return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => reject(new Error(`${this.messageChannel.hostname}:${this.messageChannel.port} did not receive ${message} within ${(this.messageChannel.connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), this.connectionTimeout);
+            const timeout = setTimeout(() => reject(new Error(`${hostname}:${port} did not receive ${message} within ${(connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), connectionTimeout);
         
             this.addMessageHandler(message, () => {
                 clearTimeout(timeout);
