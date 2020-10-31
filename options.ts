@@ -74,4 +74,7 @@ const networkScannerOptionsSchema = z.object({
 
 const parseOptions = (options: NetworkScannerOptions): NetworkScannerOptions => networkScannerOptionsSchema.parse(options);
 
-export { NetworkScannerOptions };
+export {
+    NetworkScannerOptions,
+    parseOptions
+};
