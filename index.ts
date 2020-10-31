@@ -12,9 +12,12 @@ class ChiaNetworkScanner {
     /**
      * Peers are added to an async queue and a simple graph traversal of the network is performed.
      */
-    public scan(): Peer[] {
+    public async scan(): Promise<Peer[]> {
         const { node } = this.options;
         const queue = async.queue(this.processPeer, this.options.concurrency);
+
+        // Reset peers from any previous scans
+        this.peers = new Map<string, Peer>();
 
         // The network scan is started from our own Chia node
         queue.push(new Peer({
@@ -23,10 +26,11 @@ class ChiaNetworkScanner {
             timestamp: Math.floor(Date.now() / 1000)
         }));
 
-        // Reset peers from any previous scans
-        this.peers = new Map<string, Peer>();
-
-        return [];
+        await queue.drain();
+        
+        return [
+            ...this.peers.values()
+        ];
     }
 
     /**
