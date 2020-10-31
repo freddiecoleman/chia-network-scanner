@@ -3,6 +3,8 @@ import { NetworkScannerOptions, parseOptions } from './options';
 import { Peer } from './peer';
 
 class ChiaNetworkScanner {
+    private peers = new Map<string, Peer>();
+
     public constructor(private readonly options: NetworkScannerOptions) {
         this.options = parseOptions(options);
     }
@@ -21,13 +23,31 @@ class ChiaNetworkScanner {
             timestamp: Math.floor(Date.now() / 1000)
         }));
 
+        // Reset peers from any previous scans
+        this.peers = new Map<string, Peer>();
+
         return [];
     }
 
     /**
      * Finds peers of a peer.
      */
-    private processPeer(peer: Peer, callback: async.ErrorCallback) {
+    private processPeer(peer: Peer, callback: async.ErrorCallback): void {
+        const peerHash = peer.hash();
+
+        if (!this.peers.has(peerHash)) {
+            this.peers.set(peerHash, peer);
+        }
+
+        // We only visit each peer once
+        if (peer.hasBeenVisited()) {
+            return callback();
+        }
+
+        // Set to visited immediately to prevent async processing of the same peer
+        peer.visit();
+
+        
 
         callback();
     }
