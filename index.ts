@@ -13,7 +13,7 @@ class ChiaNetworkScanner {
     }
 
     /**
-     * Peers are added to an async queue and a simple graph traversal of the network is performed.
+     * The scan is started from the full node provided in the options.
      */
     public async scan(): Promise<Peer[]> {
         const { node } = this.options;
@@ -36,7 +36,9 @@ class ChiaNetworkScanner {
     }
 
     /**
-     * Finds peers of a peer.
+     * Peers are added to the async queue and a graph traversal of the network is performed.
+     * 
+     * The concurrency parameter passed in the constructor specifies how many of these are executed concurrently via the event loop.
      */
     private async processPeer(peer: Peer, callback: async.ErrorCallback): Promise<void> {
         const { connectionTimeout, network, peer: peerOptions } = this.options;
