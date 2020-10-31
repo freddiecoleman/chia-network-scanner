@@ -47,7 +47,13 @@ class ChiaNetworkScanner {
         // Set to visited immediately to prevent async processing of the same peer
         peer.visit();
 
-        
+        // Todo: Establish TCP connection
+
+        // Todo: Perform application level handshake
+
+        // Todo: Request peers
+
+        // Todo: Close TCP connection
 
         callback();
     }
