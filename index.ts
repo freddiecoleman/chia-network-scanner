@@ -72,9 +72,13 @@ class ChiaNetworkScanner {
 
         // Todo: Request peers
 
-        // Todo: Close TCP connection
-
-        callback();
+        try {
+            await messageChannel.close();
+        } catch (err) {
+            log.err(err);
+        } finally {
+            callback();
+        }
     }
 }
 
