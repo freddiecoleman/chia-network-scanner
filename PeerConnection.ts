@@ -157,8 +157,7 @@ class PeerConnection {
 
             log.info(`No handler for ${messageType} message. Discarding it.`);
         } catch (err) {
-            // We NEED to catch here because anybody could send any old rubbish down the wire
-            // We don't want people doing that to crash our peer, especially as consul reloads nginx when the process dies and when it comes back up
+            // Anybody could send any old rubbish down the wire and we don't want that to crash our process
             log.error(err, 'Error handling inbound message');
             log.info(`Hex of message that could not be decoded: ${data.toString('hex')}`);
         }
