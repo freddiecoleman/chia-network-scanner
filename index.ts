@@ -37,7 +37,8 @@ class ChiaNetworkScanner {
     /**
      * Finds peers of a peer.
      */
-    private processPeer(peer: Peer, callback: async.ErrorCallback): void {
+    private async processPeer(peer: Peer, callback: async.ErrorCallback): void {
+        const { connectionTimeout, network, peer: peerOptions } = this.options;
         const peerHash = peer.hash();
 
         if (!this.peers.has(peerHash)) {
@@ -53,8 +54,13 @@ class ChiaNetworkScanner {
         peer.visit();
 
         const messageChannel = new MessageChannel({
+            networkId: network.networkId,
+            protocolVersion: network.protocolVersion,
+            nodeId: peerOptions.nodeId,
+            nodeType: peerOptions.nodeType,
             hostname: peer.hostname,
             port: peer.port,
+            connectionTimeout,
             onMessage: (message, channel) => {
 
 
@@ -62,7 +68,7 @@ class ChiaNetworkScanner {
             }
         });
 
-        // Todo: Perform application level handshake
+        await messageChannel.handshake();
 
         // Todo: Request peers
 
