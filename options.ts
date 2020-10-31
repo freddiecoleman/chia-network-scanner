@@ -1,7 +1,10 @@
 import * as z from 'zod';
 
-type NetworkId = 'testnet' | 'mainnet'; // There will eventually be 3 networks
-type ProtocolVersion = '0.0.18'; // For now we will only support one protocol at a time and try to keep up to date
+// There will soon be 3 networks.
+type NetworkId = 'testnet' | 'mainnet';
+
+// For now we will just try to keep up to date with the latest version. Should be easy as we do not implement the entire protocol.
+type ProtocolVersion = '0.0.18';
 
 /**
  * Connection options for connecting to a full Chia node with the peer protocol.
@@ -17,8 +20,6 @@ interface NodeOptions {
 interface NetworkOptions {
     networkId: NetworkId;
     protocolVersion: ProtocolVersion;
-    // Time within which a peer much respond to peer protocol handshake before bailing in ms.
-    connectionTimeout: number;
 }
 
 /**
@@ -36,6 +37,10 @@ interface NetworkScannerOptions {
     node: NodeOptions;
     network: NetworkOptions;
     peer: PeerOptions;
+    // Time within which a peer much respond to peer protocol handshake before bailing in ms.
+    connectionTimeout: number;
+    // Number of peers to scan at the same time (bigger is faster but uses more sockets and memory)
+    concurrency: number;
 }
 
 const nodeOptionsSchema = z.object({
@@ -51,11 +56,7 @@ const networkOptionsSchema = z.object({
         z.literal('testnet'),
         z.literal('mainnet')
     ]),
-    protocolVersion: z.literal('0.0.18'),
-    connectionTimeout: z
-        .number()
-        .min(250)
-        .max(30000)
+    protocolVersion: z.literal('0.0.18')
 });
 
 const peerOptionsSchema = z.object({
@@ -69,7 +70,15 @@ const peerOptionsSchema = z.object({
 const networkScannerOptionsSchema = z.object({
     node: nodeOptionsSchema,
     network: networkOptionsSchema,
-    peer: peerOptionsSchema
+    peer: peerOptionsSchema,
+    connectionTimeout: z
+        .number()
+        .min(250)
+        .max(30000),
+    concurrency: z
+        .number()
+        .min(1)
+        .max(255) // Fairly arbitrary, may want to increase this later ¯\_(ツ)_/¯
 });
 
 const parseOptions = (options: NetworkScannerOptions): NetworkScannerOptions => networkScannerOptionsSchema.parse(options);
