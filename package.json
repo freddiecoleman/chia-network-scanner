@@ -4,7 +4,9 @@
   "description": "Scans the Chia network for active full nodes",
   "main": "index.js",
   "scripts": {
-    "test": "jest --runInBand test/"
+    "build": "tsc",
+    "test": "jest --runInBand test/",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
