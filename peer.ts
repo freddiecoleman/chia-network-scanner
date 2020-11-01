@@ -1,5 +1,4 @@
 import { createHash } from 'crypto';
-import { create } from 'domain';
 
 interface PeerOptions {
     hostname: string;
