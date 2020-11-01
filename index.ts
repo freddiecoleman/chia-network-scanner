@@ -40,13 +40,16 @@ class ChiaNetworkScanner {
      * 
      * The concurrency parameter passed in the constructor specifies how many of these are executed concurrently via the event loop.
      */
-    private async processPeer(peer: Peer, callback: async.ErrorCallback): Promise<void> {
+    private async processPeer(proposedPeer: Peer, callback: async.ErrorCallback): Promise<void> {
         const { connectionTimeout, network, peer: peerOptions } = this.options;
-        const peerHash = peer.hash();
+        const peerHash = proposedPeer.hash();
 
         if (!this.peers.has(peerHash)) {
-            this.peers.set(peerHash, peer);
+            this.peers.set(peerHash, proposedPeer);
         }
+
+        // Ensures we get the visited value of peer from previous traversal
+        const peer = this.peers.get(peerHash) as Peer;
 
         // We only visit each peer once
         if (peer.visited) {
