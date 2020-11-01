@@ -7,6 +7,7 @@ import { PeerConnection } from './PeerConnection';
 class ChiaNetworkScanner {
     private readonly queue = async.queue(this.processPeer, this.options.concurrency);
     private peers = new Map<string, Peer>();
+    private scanInProgress = false;
 
     public constructor(private readonly options: NetworkScannerOptions) {
         this.options = parseOptions(options);
@@ -16,6 +17,13 @@ class ChiaNetworkScanner {
      * The scan is started from the full node provided in the options.
      */
     public async scan(): Promise<Peer[]> {
+        if (this.scanInProgress) {
+            throw new Error('Only one scan be be performed at a time');
+        }
+
+        // Prevents caller from executing async scan more than once at a time
+        this.scanInProgress = true;
+
         const { node } = this.options;
 
         // Reset peers from any previous scans
@@ -29,6 +37,9 @@ class ChiaNetworkScanner {
         }));
 
         await this.queue.drain();
+
+        // Async network scan has finished, another could now be performed
+        this.scanInProgress = false;
         
         return [
             ...this.peers.values()
