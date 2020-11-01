@@ -48,3 +48,4 @@ const chiaNetworkScanner = new ChiaNetworkScanner({
 const peers = await chiaNetworkScanner.scan();
 ```
 
+The result of the scan is an array of peer objects that have a `hostname`, `port` and `timestamp`.
