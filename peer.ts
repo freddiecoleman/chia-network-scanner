@@ -25,6 +25,7 @@ class Peer {
 
     public hash(): string {
         return createHash('sha1')
+            // Timestamp is not included as the same peer may be reported with a different timestamp
             .update(`${this.hostname}${this.port}`)
             .digest('hex');
     }
