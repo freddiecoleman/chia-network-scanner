@@ -25,7 +25,7 @@ class Peer {
 
     public hash(): string {
         return createHash('sha1')
-            .update(`${this.hostname}${this.port}${this.timestamp}`)
+            .update(`${this.hostname}${this.port}`)
             .digest('hex');
     }
 }
