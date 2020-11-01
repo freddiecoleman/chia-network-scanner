@@ -11,7 +11,35 @@ This powers the node count charts of [Chia Explorer](https://www.chiaexplorer.co
 Here is an example of how to scan the Chia Network:
 
 ```javascript
+import { ChiaNetworkScanner } from 'chia-network-scanner';
 
+const chiaNetworkScanner = new ChiaNetworkScanner({
+    // The network to scan and protocol to use
+    network: {
+        networkId: 'testnet',
+        protocolVersion: '0.0.18',
+    },
+
+    // The first node to scan, you don't have to use localhost but it works if you are running a Chia node locally
+    node: {
+        hostname: 'localhost',
+        port: 8444,
+    },
+
+    // Identifies this peer on the network
+    peer: {
+        nodeId: '1337-network-scanner............',
+        nodeType: 1,
+    },
+
+    // Used to timeout on various operations such as handshake
+    connectionTimeout: 2500,
+
+    // Number of peers to scan concurrently. Bigger is faster but uses more sockets and memory :)
+    concurrency: 50,
+});
+
+const peers = await chiaNetworkScanner.scan();
 ```
 
 Connection details for a node from which to start the scan must be provided.

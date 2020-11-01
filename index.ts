@@ -5,7 +5,7 @@ import { Peer } from './peer';
 import { PeerConnection } from './PeerConnection';
 
 class ChiaNetworkScanner {
-    private readonly queue = async.queue(this.processPeer, this.options.concurrency);
+    private readonly queue = async.queue(this.processPeer.bind(this), this.options.concurrency);
     private peers = new Map<string, Peer>();
     private scanInProgress = false;
 
@@ -21,6 +21,8 @@ class ChiaNetworkScanner {
             throw new Error('Only one scan be be performed at a time');
         }
 
+        log.info('Starting scan of Chia Network');
+
         // Prevents caller from executing async scan more than once at a time
         this.scanInProgress = true;
 
@@ -34,7 +36,7 @@ class ChiaNetworkScanner {
             hostname: node.hostname,
             port: node.port,
             timestamp: Math.floor(Date.now() / 1000)
-        }));
+        }), (e) => { console.log('fin', e); });
 
         await this.queue.drain();
 
@@ -52,10 +54,15 @@ class ChiaNetworkScanner {
      * The concurrency parameter passed in the constructor specifies how many of these are executed concurrently via the event loop.
      */
     private async processPeer(proposedPeer: Peer, callback: async.ErrorCallback): Promise<void> {
+        const peerLogger = log.child({
+            ...proposedPeer
+        });
         const { connectionTimeout, network, peer: peerOptions } = this.options;
         const peerHash = proposedPeer.hash();
 
         if (!this.peers.has(peerHash)) {
+            peerLogger.debug('First time seeing peer');
+
             this.peers.set(peerHash, proposedPeer);
         }
 
@@ -64,8 +71,12 @@ class ChiaNetworkScanner {
 
         // We only visit each peer once
         if (peer.visited) {
+            peerLogger.debug('Skipping already visited peer');
+
             return callback();
         }
+
+        peerLogger.info('Visiting peer');
 
         // Set to visited immediately to prevent async processing of the same peer
         peer.visit();

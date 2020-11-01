@@ -113,8 +113,6 @@ class PeerConnection {
                 resolve(peers);
             });
     
-            log.info('Requesting peers');
-    
             this.sendMessage('request_peers', {});
         });
     }
@@ -124,7 +122,7 @@ class PeerConnection {
     }
 
     private addMessageHandler(messageType: string, handler: Function) {
-        log.info(`Adding message handler for ${messageType} messages`);
+        log.debug(`Adding message handler for ${messageType} messages`);
 
         this.messageHandlers.set(messageType, handler);
     }
@@ -135,17 +133,17 @@ class PeerConnection {
             const messageType = message.f;
             const handler = this.messageHandlers.get(messageType);
 
-            log.info(`Succesfully decoded ${messageType}`);
+            log.debug(`Succesfully decoded ${messageType}`);
 
             if (handler) {
                 return handler(message.d);
             }
 
-            log.info(`No handler for ${messageType} message. Discarding it.`);
+            log.warn(`No handler for ${messageType} message. Discarding it.`);
         } catch (err) {
             // Anybody could send any old rubbish down the wire and we don't want that to crash our process
             log.error(err, 'Error handling inbound message');
-            log.info(`Hex of message that could not be decoded: ${data.toString('hex')}`);
+            log.warn(`Hex of message that could not be decoded: ${data.toString('hex')}`);
         }
     }
 
