@@ -49,3 +49,25 @@ const peers = await chiaNetworkScanner.scan();
 ```
 
 The result of the scan is an array of peer objects that have a `hostname`, `port` and `timestamp`.
+
+## Logs
+
+You will see lots of logs about connections refused and not handling messages that other peers have sent to you. This is fine. Example:
+
+```
+{"level":30,"time":1604247342367,"pid":72087,"hostname":"chiaexplorer","msg":"Sending handshake message"}
+{"level":30,"time":1604247342406,"pid":72087,"hostname":"chiaexplorer","msg":"Established TCP connection to Chia node 92.29.105.141:8444"}
+{"level":30,"time":1604247342442,"pid":72087,"hostname":"chiaexplorer","msg":"Sending handshake_ack message"}
+{"level":30,"time":1604247342442,"pid":72087,"hostname":"chiaexplorer","msg":"Sending request_peers message"}
+{"level":40,"time":1604247342465,"pid":72087,"hostname":"chiaexplorer","msg":"No handler for new_tip message. Discarding it."}
+{"level":40,"time":1604247342482,"pid":72087,"hostname":"chiaexplorer","msg":"No handler for new_tip message. Discarding it."}
+{"level":40,"time":1604247342482,"pid":72087,"hostname":"chiaexplorer","msg":"No handler for new_tip message. Discarding it."}
+{"level":40,"time":1604247342482,"pid":72087,"hostname":"chiaexplorer","msg":"No handler for request_mempool_transactions message. Discarding it."}
+{"level":30,"time":1604247342528,"pid":72087,"hostname":"chiaexplorer","msg":"Connection closed"}
+{"level":30,"time":1604247342652,"pid":72087,"hostname":"chiaexplorer","errno":"ECONNREFUSED","code":"ECONNREFUSED","syscall":"connect","address":"2003:db:772e:500:5ce7:935c:aa0b:8834","port":8444,"stack":"Error: connect ECONNREFUSED 2003:db:772e:500:5ce7:935c:aa0b:8834:8444\n    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1141:16)","type":"Error","msg":"Connection closed"}
+{"level":30,"time":1604247342652,"pid":72087,"hostname":"chiaexplorer","msg":"Connection closed"}
+{"level":30,"time":1604247342681,"pid":72087,"hostname":"chiaexplorer","errno":"ENETUNREACH","code":"ENETUNREACH","syscall":"connect","address":"2a01:c23:78b3:2801:4085:7f6f:5cbf:ba5","port":8444,"stack":"Error: connect ENETUNREACH 2a01:c23:78b3:2801:4085:7f6f:5cbf:ba5:8444\n    at TCPConnectWrap.afterConnect [as oncomplete] (net.js:1141:16)","type":"Error","msg":"Connection closed"}
+{"level":30,"time":1604247342682,"pid":72087,"hostname":"chiaexplorer","msg":"Connection closed"}
+{"level":30,"time":1604247342698,"pid":72087,"hostname":"chiaexplorer","visited":false,"hostname":"165.227.56.10","port":8444,"timestamp":1602428570,"msg":"Visiting peer"}
+{"level":30,"time":1604247342699,"pid":72087,"hostname":"chiaexplorer","msg":"Sending handshake message"}
+```
