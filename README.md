@@ -34,7 +34,7 @@ const chiaNetworkScanner = new ChiaNetworkScanner({
 
     // Identifies this peer on the network
     peer: {
-        nodeId: '1337-network-scanner............',
+        nodeId: '1337-network-scanner............', // must be 32 characters long
         nodeType: 1,
     },
 
@@ -48,4 +48,3 @@ const chiaNetworkScanner = new ChiaNetworkScanner({
 const peers = await chiaNetworkScanner.scan();
 ```
 
-Connection details for a node from which to start the scan must be provided.
