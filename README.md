@@ -8,6 +8,12 @@ This powers the node count charts of [Chia Explorer](https://www.chiaexplorer.co
 
 ## Usage
 
+This can be installed as a module using npm:
+
+```bash
+npm install chia-network-scanner
+```
+
 Here is an example of how to scan the Chia Network:
 
 ```javascript
