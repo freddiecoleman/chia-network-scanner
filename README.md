@@ -1,11 +1,17 @@
 # Chia Network Scanner
 
-Implements enough of the Chia peer protocol to perform a scan of full nodes connected to the Chia network.
+Performs an asyncronous scan of the Chia network.
+
+Rather than implementing a full node it communicates with another full node and requests it's peers - from there a graph traversal of the network is performed.
 
 This powers the node count charts of [Chia Explorer](https://www.chiaexplorer.com).
 
-This is a MVP that make assumptions about peers on the network. Contributions are welcome to help battle harden it.
+## Usage
 
-## WIP
+Here is an example of how to scan the Chia Network:
 
-The code is currently being extracted from another project and being wrapped with a nicer API.
+```javascript
+
+```
+
+Connection details for a node from which to start the scan must be provided.
