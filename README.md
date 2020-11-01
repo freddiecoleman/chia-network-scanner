@@ -71,3 +71,7 @@ You will see lots of logs about connections refused and not handling messages th
 {"level":30,"time":1604247342698,"pid":72087,"hostname":"chiaexplorer","visited":false,"hostname":"165.227.56.10","port":8444,"timestamp":1602428570,"msg":"Visiting peer"}
 {"level":30,"time":1604247342699,"pid":72087,"hostname":"chiaexplorer","msg":"Sending handshake message"}
 ```
+
+## Contributions welcome
+
+Feel free to contribute with PRs or even by throwing ideas into the issue tab.
