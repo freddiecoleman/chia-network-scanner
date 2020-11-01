@@ -4,7 +4,7 @@
   "description": "Scans the Chia network for active full nodes",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --runInBand test/"
   },
   "repository": {
     "type": "git",
@@ -26,8 +26,12 @@
   "devDependencies": {
     "@types/async": "^3.2.3",
     "@types/cbor": "^5.0.1",
+    "@types/jest": "^26.0.15",
     "@types/node": "^14.14.6",
     "@types/pino": "^6.3.3",
+    "jest": "^26.6.1",
+    "prettier": "^2.1.2",
+    "ts-jest": "^26.4.3",
     "typescript": "^4.0.5"
   },
   "dependencies": {
@@ -35,5 +39,20 @@
     "cbor": "^5.1.0",
     "pino": "^6.7.0",
     "zod": "^1.11.10"
+  },
+  "jest": {
+    "roots": [
+      "<rootDir>"
+    ],
+    "transform": {
+      "^.+\\.tsx?$": "ts-jest"
+    },
+    "restoreMocks": true,
+    "globals": {
+      "ts-jest": {
+        "tsConfig": "tsconfig.json",
+        "isolatedModules": true
+      }
+    }
   }
 }
