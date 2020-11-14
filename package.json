@@ -1,6 +1,6 @@
 {
   "name": "chia-network-scanner",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "Scans the Chia network for active full nodes",
   "main": "dist/index.js",
   "scripts": {
