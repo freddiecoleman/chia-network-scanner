@@ -53,7 +53,7 @@ class ChiaNetworkScanner {
      * 
      * The concurrency parameter passed in the constructor specifies how many of these are executed concurrently via the event loop.
      */
-    private async processPeer(proposedPeer: Peer, callback: async.ErrorCallback): Promise<void> {
+    private async processPeer(proposedPeer: Peer): Promise<void> {
         const peerLogger = log.child({
             ...proposedPeer
         });
@@ -73,7 +73,7 @@ class ChiaNetworkScanner {
         if (peer.visited) {
             peerLogger.debug('Skipping already visited peer');
 
-            return callback();
+            return;
         }
 
         peerLogger.info('Visiting peer');
@@ -105,8 +105,6 @@ class ChiaNetworkScanner {
             await peerConnection.close();
         } catch (err) {
             log.err(err);
-        } finally {
-            callback();
         }
     }
 }
