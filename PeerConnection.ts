@@ -117,7 +117,7 @@ class PeerConnection {
         });
     }
 
-    public close(): Promise<void> {
+    public close(): void {
         return this.messageChannel.close();
     }
 
