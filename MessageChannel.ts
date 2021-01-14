@@ -58,7 +58,7 @@ class MessageChannel {
             this.ws = new WebSocket(`wss://${this.hostname}:${this.port}/ws`, { rejectUnauthorized: false });
             this.ws.on('message', (data: Buffer): void => this.messageHandler(data));
             this.ws.on('close', () => this.onClose());
-            this.ws.on('connection', () => {
+            this.ws.on('open', () => {
                 this.onConnected();
 
                 resolve();
