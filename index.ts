@@ -92,8 +92,12 @@ class ChiaNetworkScanner {
             connectionTimeout
         });
 
+        peerLogger.info('Establishing websocket connection');
+
         // Establish websocket connection
         await peerConnection.connect();
+
+        peerLogger.info('Websocket connection established');
 
         // Performs application level handshake with peer
         await peerConnection.handshake();

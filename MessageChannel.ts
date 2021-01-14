@@ -53,7 +53,9 @@ class MessageChannel {
 
     public async connect(): Promise<void> {
         return new Promise(resolve => {
-            this.ws = new WebSocket(`wss://${this.hostname}:${this.port}`, { rejectUnauthorized: false });
+            log.info(`Attempting websocket connection to wss://${this.hostname}:${this.port}/ws`);
+
+            this.ws = new WebSocket(`wss://${this.hostname}:${this.port}/ws`, { rejectUnauthorized: false });
             this.ws.on('message', (data: Buffer): void => this.messageHandler(data));
             this.ws.on('close', () => this.onClose());
             this.ws.on('connection', () => {
