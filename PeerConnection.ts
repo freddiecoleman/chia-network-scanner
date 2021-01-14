@@ -46,6 +46,10 @@ class PeerConnection {
         });
     }
 
+    public async connect(): Promise<void> {
+        return this.messageChannel.connect();
+    }
+
     /**
      * Chia application level handshake required before using the peer protocol.
      */

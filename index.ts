@@ -92,6 +92,9 @@ class ChiaNetworkScanner {
             connectionTimeout
         });
 
+        // Establish websocket connection
+        await peerConnection.connect();
+
         // Performs application level handshake with peer
         await peerConnection.handshake();
 

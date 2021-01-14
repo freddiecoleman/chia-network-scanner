@@ -21,7 +21,7 @@ interface Message {
 
 class MessageChannel {
     private readonly onMessage: (message: Buffer) => void;
-    private readonly ws: WebSocket;
+    private ws: WebSocket | null = null;
     private inboundDataBuffer: Buffer = Buffer.from([]);
     public readonly hostname: string;
     public readonly port: number;
@@ -49,36 +49,45 @@ class MessageChannel {
         this.port = port;
         this.onMessage = onMessage;
         this.connectionTimeout = connectionTimeout;
-        this.ws = new WebSocket(`wss://${hostname}:${port}`, { rejectUnauthorized: false });
+    }
 
-        this.ws.on('message', (data: Buffer): void => {
-            this.inboundDataBuffer = Buffer.concat([this.inboundDataBuffer, data]);
+    public async connect(): Promise<void> {
+        return new Promise(resolve => {
+            this.ws = new WebSocket(`wss://${this.hostname}:${this.port}`, { rejectUnauthorized: false });
+            this.ws.on('message', (data: Buffer): void => this.messageHandler(data));
+            this.ws.on('close', () => this.onClose());
+            this.ws.on('connection', () => {
+                this.onConnected();
 
-            const length = this.inboundDataBuffer.readUIntBE(0, 4);
-            const messageStreamed = this.inboundDataBuffer.byteLength - 4 === length;
-            const bufferOverflow = this.inboundDataBuffer.byteLength - 4 > length;
-
-            if (messageStreamed) {
-                this.onMessage(this.inboundDataBuffer);
-
-                this.inboundDataBuffer = Buffer.from([]);
-            } else if (bufferOverflow) {
-                // Very basic protection against badly developed or malicious peers
-                // Depending on what they are doing this could happen many times in a row but should eventually recover
-                this.inboundDataBuffer = Buffer.from([]);
-            }
+                resolve();
+            });
         });
-
-        this.ws.on('close', () => this.onClose());
-        this.ws.on('connection', () => this.onConnected());
     }
 
     public sendMessage(message: Buffer): void {
-        this.ws.send(message);
+        this.ws?.send(message);
     }
 
     public close(): void {
-        this.ws.close();
+        this.ws?.close();
+    }
+
+    private messageHandler(data: Buffer): void {
+        this.inboundDataBuffer = Buffer.concat([this.inboundDataBuffer, data]);
+
+        const length = this.inboundDataBuffer.readUIntBE(0, 4);
+        const messageStreamed = this.inboundDataBuffer.byteLength - 4 === length;
+        const bufferOverflow = this.inboundDataBuffer.byteLength - 4 > length;
+
+        if (messageStreamed) {
+            this.onMessage(this.inboundDataBuffer);
+
+            this.inboundDataBuffer = Buffer.from([]);
+        } else if (bufferOverflow) {
+            // Very basic protection against badly developed or malicious peers
+            // Depending on what they are doing this could happen many times in a row but should eventually recover
+            this.inboundDataBuffer = Buffer.from([]);
+        }
     }
 
     private onConnected(): void {
