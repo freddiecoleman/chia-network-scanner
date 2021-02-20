@@ -18,8 +18,7 @@ const decodePeer = (peer: Buffer): Peer => {
 const encodeMessage = (func: string, data: any): Buffer => {
     const message = cbor.encode({
         f: func,
-        d: data,
-        i: Buffer.from('test') // Todo: temporarily doing this to see if it fixes the current error
+        d: data
     }) as Buffer;
 
     return message;
