@@ -57,7 +57,8 @@ const encodeMessage = (messageType: number, data: any): Buffer => {
         ]);
     }
 
-    if (messageType === ProtocolMessageTypes.handshake_ack) {
+    // Messages that only have a type and don't contain any data
+    if (messageType === ProtocolMessageTypes.handshake_ack || messageType === ProtocolMessageTypes.request_peers) {
         return Buffer.from([messageType]);
     }
 
@@ -100,7 +101,7 @@ const decodeMessage = (message: Buffer): any => {
         };
     }
 
-    if (messageType === ProtocolMessageTypes.handshake_ack) {
+    if (messageType === ProtocolMessageTypes.handshake_ack || messageType === ProtocolMessageTypes.request_peers) {
         return {};
     }
 

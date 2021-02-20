@@ -42,6 +42,14 @@ describe('encoder', () => {
                 `"02"`
             );
         });
+
+        it('encodes request_peers message', () => {
+            const encodedRequestPeers = encodeMessage(40, {});
+
+            expect(encodedRequestPeers.toString('hex')).toMatchInlineSnapshot(
+                `"28"`
+            );
+        });
     });
 
     describe('decodeMessages', () => {
@@ -69,6 +77,13 @@ describe('encoder', () => {
             const decodedHandshakeAck = decodeMessage(encodedHandshakeAck);
 
             expect(decodedHandshakeAck).toEqual({});
+        });
+
+        it('decodes request_peers message', () => {
+            const encodedRequestPeers = encodeMessage(40, {});
+            const decodedRequestPeers = decodeMessage(encodedRequestPeers);
+
+            expect(decodedRequestPeers).toEqual({});
         });
     });
 });
