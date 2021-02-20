@@ -20,6 +20,7 @@ interface NodeOptions {
 interface NetworkOptions {
     networkId: NetworkId;
     protocolVersion: ProtocolVersion;
+    softwareVersion: string;
 }
 
 /**
@@ -64,7 +65,8 @@ const networkOptionsSchema = z.object({
         z.literal('testnet'),
         z.literal('mainnet')
     ]),
-    protocolVersion: z.literal('0.0.29')
+    protocolVersion: z.literal('0.0.29'),
+    softwareVersion: z.string()
 });
 
 const peerOptionsSchema = z.object({
