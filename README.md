@@ -23,7 +23,7 @@ const chiaNetworkScanner = new ChiaNetworkScanner({
     // The network to scan and protocol to use
     network: {
         networkId: 'testnet',
-        protocolVersion: '0.0.18',
+        protocolVersion: '0.0.29',
     },
 
     // The first node to scan, you don't have to use localhost but it works if you are running a Chia node locally

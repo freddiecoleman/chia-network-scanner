@@ -6,7 +6,7 @@ describe('options parser', () => {
             parseOptions({
                 network: {
                     networkId: 'testnet',
-                    protocolVersion: '0.0.18',
+                    protocolVersion: '0.0.29',
                 },
                 node: {
                     hostname: 'chia.net',
@@ -18,6 +18,8 @@ describe('options parser', () => {
                 },
                 connectionTimeout: 2500,
                 concurrency: 50,
+                certPath: '/root/cert.crt',
+                keyPath: '/root/key.key'
             })
         ).toThrowErrorMatchingInlineSnapshot(`
             "1 validation issue(s)
@@ -33,7 +35,7 @@ describe('options parser', () => {
             parseOptions({
                 network: {
                     networkId: 'testnet',
-                    protocolVersion: '0.0.18',
+                    protocolVersion: '0.0.29',
                 },
                 node: {
                     hostname: 'chia.net',
@@ -45,6 +47,8 @@ describe('options parser', () => {
                 },
                 connectionTimeout: 2500,
                 concurrency: 10000,
+                certPath: '/root/cert.crt',
+                keyPath: '/root/key.key'
             })
         ).toThrowErrorMatchingInlineSnapshot(`
             "1 validation issue(s)
@@ -60,7 +64,7 @@ describe('options parser', () => {
             parseOptions({
                 network: {
                     networkId: 'testnet',
-                    protocolVersion: '0.0.18',
+                    protocolVersion: '0.0.29',
                 },
                 node: {
                     hostname: 'chia.net',
@@ -72,6 +76,8 @@ describe('options parser', () => {
                 },
                 connectionTimeout: 0,
                 concurrency: 100,
+                certPath: '/root/cert.crt',
+                keyPath: '/root/key.key'
             })
         ).toThrowErrorMatchingInlineSnapshot(`
             "1 validation issue(s)
@@ -87,7 +93,7 @@ describe('options parser', () => {
             parseOptions({
                 network: {
                     networkId: 'testnet',
-                    protocolVersion: '0.0.18',
+                    protocolVersion: '0.0.29',
                 },
                 node: {
                     hostname: 'chia.net',
@@ -99,6 +105,8 @@ describe('options parser', () => {
                 },
                 connectionTimeout: 60000,
                 concurrency: 100,
+                certPath: '/root/cert.crt',
+                keyPath: '/root/key.key'
             })
         ).toThrowErrorMatchingInlineSnapshot(`
             "1 validation issue(s)
@@ -114,7 +122,7 @@ describe('options parser', () => {
             parseOptions({
                 network: {
                     networkId: 'testnet',
-                    protocolVersion: '0.0.18',
+                    protocolVersion: '0.0.29',
                 },
                 node: {
                     hostname: 'chia.net',
@@ -126,6 +134,8 @@ describe('options parser', () => {
                 },
                 connectionTimeout: 5000,
                 concurrency: 100,
+                certPath: '/root/cert.crt',
+                keyPath: '/root/key.key'
             })
         ).toThrowErrorMatchingInlineSnapshot(`
             "1 validation issue(s)
@@ -140,7 +150,7 @@ describe('options parser', () => {
         const options = parseOptions({
             network: {
                 networkId: 'testnet',
-                protocolVersion: '0.0.18',
+                protocolVersion: '0.0.29',
             },
             node: {
                 hostname: 'chia.net',
@@ -152,6 +162,8 @@ describe('options parser', () => {
             },
             connectionTimeout: 2500,
             concurrency: 50,
+            certPath: '/root/cert.crt',
+            keyPath: '/root/key.key'
         });
 
         expect(options).toMatchInlineSnapshot(`
@@ -160,7 +172,7 @@ describe('options parser', () => {
               "connectionTimeout": 2500,
               "network": Object {
                 "networkId": "testnet",
-                "protocolVersion": "0.0.18",
+                "protocolVersion": "0.0.29",
               },
               "node": Object {
                 "hostname": "chia.net",

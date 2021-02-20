@@ -4,7 +4,7 @@ import * as z from 'zod';
 type NetworkId = 'testnet' | 'mainnet';
 
 // For now we will just try to keep up to date with the latest version. Should be easy as we do not implement the entire protocol.
-type ProtocolVersion = '0.0.18';
+type ProtocolVersion = '0.0.29';
 
 /**
  * Connection options for connecting to a full Chia node with the peer protocol.
@@ -37,10 +37,18 @@ interface NetworkScannerOptions {
     node: NodeOptions;
     network: NetworkOptions;
     peer: PeerOptions;
+
     // Time within which a peer much respond to peer protocol handshake before bailing in ms.
     connectionTimeout: number;
+
     // Number of peers to scan at the same time (bigger is faster but uses more sockets and memory)
     concurrency: number;
+
+    // Path to full node public cert
+    certPath: string;
+
+    // Path to full node public key
+    keyPath: string;
 }
 
 const nodeOptionsSchema = z.object({
@@ -56,7 +64,7 @@ const networkOptionsSchema = z.object({
         z.literal('testnet'),
         z.literal('mainnet')
     ]),
-    protocolVersion: z.literal('0.0.18')
+    protocolVersion: z.literal('0.0.29')
 });
 
 const peerOptionsSchema = z.object({
@@ -78,7 +86,9 @@ const networkScannerOptionsSchema = z.object({
     concurrency: z
         .number()
         .min(1)
-        .max(255) // Fairly arbitrary, may want to increase this later ¯\_(ツ)_/¯
+        .max(255), // Fairly arbitrary, may want to increase this later ¯\_(ツ)_/¯
+    certPath: z.string(),
+    keyPath: z.string()
 });
 
 const parseOptions = (options: NetworkScannerOptions): NetworkScannerOptions => networkScannerOptionsSchema.parse(options);

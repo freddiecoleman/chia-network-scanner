@@ -1,3 +1,4 @@
+import fs from 'fs';
 import * as async from 'async';
 import { log } from './log';
 import { NetworkScannerOptions, parseOptions } from './options';
@@ -57,7 +58,7 @@ class ChiaNetworkScanner {
         const peerLogger = log.child({
             ...proposedPeer
         });
-        const { connectionTimeout, network, peer: peerOptions } = this.options;
+        const { connectionTimeout, network, peer: peerOptions, certPath, keyPath } = this.options;
         const peerHash = proposedPeer.hash();
 
         if (!this.peers.has(peerHash)) {
@@ -85,11 +86,14 @@ class ChiaNetworkScanner {
         const peerConnection = new PeerConnection({
             networkId: network.networkId,
             protocolVersion: network.protocolVersion,
+            softwareVersion: '',
             nodeId: peerOptions.nodeId,
             nodeType: peerOptions.nodeType,
             hostname: peer.hostname,
             port: peer.port,
-            connectionTimeout
+            connectionTimeout,
+            cert: fs.readFileSync(certPath),
+            key: fs.readFileSync(keyPath)
         });
 
         peerLogger.info('Establishing websocket connection');

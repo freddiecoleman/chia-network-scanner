@@ -7,11 +7,14 @@ import { decodePeer, decodeMessage, encodeMessage } from './encoder';
 interface PeerConnectionOptions {
     networkId: NetworkId;
     protocolVersion: ProtocolVersion;
+    softwareVersion: string;
     nodeId: string;
     nodeType: number;
     hostname: string;
     port: number;
     connectionTimeout: number;
+    cert: Buffer;
+    key: Buffer;
 }
 
 class PeerConnection {
@@ -21,21 +24,27 @@ class PeerConnection {
     public constructor({
         networkId,
         protocolVersion,
+        softwareVersion,
         nodeId,
         nodeType,
         hostname,
         port,
-        connectionTimeout
+        connectionTimeout,
+        cert,
+        key
     }: PeerConnectionOptions) {
         this.messageChannel = new MessageChannel({
             networkId,
             protocolVersion,
+            softwareVersion,
             nodeId,
             nodeType,
             hostname,
             port,
             connectionTimeout,
-            onMessage: data => this.onMessage(data)
+            onMessage: data => this.onMessage(data),
+            cert,
+            key
         });
 
         this.addMessageHandler('ping', (ping: { nonce: Buffer }) => {
@@ -54,7 +63,7 @@ class PeerConnection {
      * Chia application level handshake required before using the peer protocol.
      */
     public async handshake(): Promise<this> {
-        const { hostname, port, connectionTimeout, networkId, protocolVersion, nodeId, nodeType } = this.messageChannel;
+        const { hostname, port, connectionTimeout, networkId, protocolVersion, softwareVersion, nodeType } = this.messageChannel;
 
         return new Promise(async(resolve, reject) => {
             const timeout = setTimeout(() => reject(new Error(`${hostname}:${port} did not respond to handshake within ${(connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), connectionTimeout);
@@ -68,8 +77,8 @@ class PeerConnection {
             // Initiate handshake
             this.sendMessage('handshake', {
                 network_id: networkId,
-                version: protocolVersion,
-                node_id: nodeId,
+                protocol_version: protocolVersion,
+                software_version: softwareVersion,
                 server_port: 8444,
                 node_type: nodeType
             });
