@@ -67,7 +67,8 @@ const decodeMessage = (message: Buffer): any => {
     if (messageType === ProtocolMessageTypes.handshake) {
         let currentPos = 1;
 
-        // Extract network_id (bytes32)
+        // Extract network_id (bytes32) - this might fail in reality as it might not be treated as string
+        // If doesn't work it might be a bug as the length is then required to be 7
         const network_id = decodeString(message.slice(currentPos)); // testnet | mainnet
 
         currentPos += 4 + network_id.length;
