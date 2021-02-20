@@ -34,6 +34,14 @@ describe('encoder', () => {
                 `"0100000007746573746e657400000006302e302e323900000006312e30726332e44c01"`
             );
         });
+
+        it('encodes handshake_ack message', () => {
+            const encodedHandshakeAck = encodeMessage(2, {});
+
+            expect(encodedHandshakeAck.toString('hex')).toMatchInlineSnapshot(
+                `"02"`
+            );
+        });
     });
 
     describe('decodeMessages', () => {
@@ -54,6 +62,13 @@ describe('encoder', () => {
                 server_port: 58444,
                 node_type: 1,
             });
+        });
+
+        it('decodes handshake_ack message', () => {
+            const encodedHandshakeAck = encodeMessage(2, {});
+            const decodedHandshakeAck = decodeMessage(encodedHandshakeAck);
+
+            expect(decodedHandshakeAck).toEqual({});
         });
     });
 });

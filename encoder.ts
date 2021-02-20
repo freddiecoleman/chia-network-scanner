@@ -57,6 +57,10 @@ const encodeMessage = (messageType: number, data: any): Buffer => {
         ]);
     }
 
+    if (messageType === ProtocolMessageTypes.handshake_ack) {
+        return Buffer.from([messageType]);
+    }
+
     throw new Error(`Could not encode message of type ${messageType}`);
 };
 
@@ -94,6 +98,10 @@ const decodeMessage = (message: Buffer): any => {
             server_port,
             node_type
         };
+    }
+
+    if (messageType === ProtocolMessageTypes.handshake_ack) {
+        return {};
     }
 
     log.warn(`Could not decode message of type ${messageType}`);
