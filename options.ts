@@ -89,7 +89,6 @@ const parseOptions = (options: NetworkScannerOptions): NetworkScannerOptions => 
 
 export {
     NetworkScannerOptions,
-    NetworkId,
     ProtocolVersion,
     parseOptions
 };
