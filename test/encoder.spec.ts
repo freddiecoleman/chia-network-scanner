@@ -32,7 +32,7 @@ describe('encoder', () => {
             });
 
             expect(encodedHandshake.toString('hex')).toMatchInlineSnapshot(
-                `"0100000007746573746e657400000006302e302e323900000006312e30726332e44c01"`
+                `"01746573746e657400000006302e302e323900000006312e30726332e44c01"`
             );
         });
 

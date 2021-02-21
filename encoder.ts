@@ -33,13 +33,16 @@ const encodeMessage = (messageType: number, data: any): Buffer => {
     if (messageType === ProtocolMessageTypes.handshake) {
         const { network_id, protocol_version, software_version, server_port, node_type } = data as Handshake;
 
+        // testnet/mainnet use 7 bytes
+        const networkIdBuffer = Buffer.from(network_id, 'utf-8');
+
         const serverPortBuffer = Buffer.alloc(2);
 
         serverPortBuffer.writeUInt16BE(server_port);
 
         return Buffer.concat([
             Buffer.from([messageType]),
-            encodeString(network_id),
+            networkIdBuffer,
             encodeString(protocol_version),
             encodeString(software_version),
             serverPortBuffer,
@@ -95,11 +98,10 @@ const decodeMessage = (message: Buffer): any => {
     if (messageType === ProtocolMessageTypes.handshake) {
         let currentPos = 1;
 
-        // Extract network_id (bytes32) - this might fail in reality as it might not be treated as string
-        // If doesn't work it might be a bug as the length is then required to be 7
-        const network_id = decodeString(message.slice(currentPos)); // testnet | mainnet
+        // Temporarily assuming the length is 7 bytes which it is for both testnet and mainnet
+        const network_id = message.slice(currentPos, currentPos + 7).toString('utf-8'); // testnet | mainnet
 
-        currentPos += 4 + network_id.length;
+        currentPos += 7;
 
         const protocol_version = decodeString(message.slice(currentPos));
 
