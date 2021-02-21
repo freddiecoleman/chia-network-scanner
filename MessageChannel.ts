@@ -90,18 +90,22 @@ class MessageChannel {
     private messageHandler(data: Buffer): void {
         this.inboundDataBuffer = Buffer.concat([this.inboundDataBuffer, data]);
 
-        const length = this.inboundDataBuffer.readUIntBE(0, 4);
-        const messageStreamed = this.inboundDataBuffer.byteLength - 4 === length;
-        const bufferOverflow = this.inboundDataBuffer.byteLength - 4 > length;
+        // Buffer is big enough to contain the length
+        if (this.inboundDataBuffer.byteLength >= 5) {
+            const messageType = data[0];
+            const messageLength = data.readUInt32BE(1);
+            const messageReady = data.byteLength === messageLength + 6;
+            const bufferOverflow = data.byteLength > messageLength + 6;
 
-        if (messageStreamed) {
-            this.onMessage(this.inboundDataBuffer);
+            if (messageReady) {
+                this.onMessage(this.inboundDataBuffer);
 
-            this.inboundDataBuffer = Buffer.from([]);
-        } else if (bufferOverflow) {
-            // Very basic protection against badly developed or malicious peers
-            // Depending on what they are doing this could happen many times in a row but should eventually recover
-            this.inboundDataBuffer = Buffer.from([]);
+                this.inboundDataBuffer = Buffer.from([]);
+            } else if (bufferOverflow) {
+                // Very basic protection against badly developed or malicious peers
+                // Depending on what they are doing this could happen many times in a row but should eventually recover
+                this.inboundDataBuffer = Buffer.from([]);
+            }
         }
     }
 

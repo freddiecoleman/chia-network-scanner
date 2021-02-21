@@ -75,16 +75,13 @@ class PeerConnection {
 
             try {
                 // Wait for handshake response
-                await Promise.all(handshakeResponse);
+                await Promise.race(handshakeResponse);
             } catch (err) {
                 return reject(err);
             }
 
             // Handshake completed within timeout
             clearTimeout(timeout);
-
-            // Acknowledge receipt of handshake from peer
-            this.sendMessage(ProtocolMessageTypes.handshake_ack, {});
 
             // We can now use the peer protocol
             resolve(this);
@@ -106,7 +103,7 @@ class PeerConnection {
         const { hostname, port, connectionTimeout } = this.messageChannel;
 
         return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => reject(new Error(`${hostname}${port} did not respond after ${(connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), connectionTimeout);
+            const timeout = setTimeout(() => reject(new Error(`${hostname}:${port} did not respond after ${(connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), connectionTimeout);
     
             this.addMessageHandler(ProtocolMessageTypes.respond_peers, (respondPeers: any) => {
                 clearTimeout(timeout);
@@ -134,10 +131,8 @@ class PeerConnection {
             const message = decodeMessage(data);
             const handler = this.messageHandlers.get(messageType);
 
-            log.debug(`Succesfully decoded ${messageType}`);
-
             if (handler) {
-                return handler(message.d);
+                return handler(message);
             }
 
             log.warn(`No handler for ${messageType} message. Discarding it.`);
