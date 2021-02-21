@@ -1,8 +1,5 @@
 import * as z from 'zod';
 
-// There will soon be 3 networks.
-type NetworkId = 'testnet' | 'mainnet';
-
 // For now we will just try to keep up to date with the latest version. Should be easy as we do not implement the entire protocol.
 type ProtocolVersion = '0.0.29';
 
@@ -18,7 +15,7 @@ interface NodeOptions {
  * Network and protocol version to connect with.
  */
 interface NetworkOptions {
-    networkId: NetworkId;
+    networkId: string;
     protocolVersion: ProtocolVersion;
     softwareVersion: string;
 }
