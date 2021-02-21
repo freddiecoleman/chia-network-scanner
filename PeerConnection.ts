@@ -46,7 +46,21 @@ class PeerConnection {
     }
 
     public async connect(): Promise<void> {
-        return this.messageChannel.connect();
+        return new Promise(async(resolve, reject) => {
+            const timeout = setTimeout(() => reject(new Error('Failed to connect to peer within 2 seconds')), 2000);
+
+            try {
+                await this.messageChannel.connect();
+
+                // Connected within timeout
+                clearTimeout(timeout);
+
+                resolve();
+            } catch (err) {
+                clearTimeout(timeout);
+                reject(err);
+            }
+        });
     }
 
     /**

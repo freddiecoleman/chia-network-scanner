@@ -97,20 +97,20 @@ class ChiaNetworkScanner {
 
         peerLogger.info('Establishing websocket connection');
 
-        // Establish websocket connection
-        await peerConnection.connect();
-
-        peerLogger.info('Websocket connection established');
-
-        // Performs application level handshake with peer
-        await peerConnection.handshake();
-
-        const peers = await peerConnection.getPeers();
-
-        // Enqueue peers of peer for async processing
-        this.queue.push(peers);
-
         try {
+             // Establish websocket connection
+            await peerConnection.connect();
+
+            peerLogger.info('Websocket connection established');
+
+            // Performs application level handshake with peer
+            await peerConnection.handshake();
+
+            const peers = await peerConnection.getPeers();
+
+            // Enqueue peers of peer for async processing
+            this.queue.push(peers);
+
             // Close TCP connection
             await peerConnection.close();
         } catch (err) {

@@ -70,7 +70,7 @@ class MessageChannel {
             });
             this.ws.on('message', (data: Buffer): void => this.messageHandler(data));
             this.ws.on('error', (err: Error): void => this.onClose(err));
-            this.ws.on('close', () => this.onClose());
+            this.ws.on('close', (_, reason) => this.onClose(new Error(reason)));
             this.ws.on('open', () => {
                 this.onConnected();
 
