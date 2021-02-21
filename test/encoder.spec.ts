@@ -24,15 +24,28 @@ describe('encoder', () => {
     describe('encodeMessage', () => {
         it('encodes handshake message', () => {
             const encodedHandshake = encodeMessage(1, {
-                network_id: 'testnet',
+                network_id: Buffer.from(
+                    'd4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35',
+                    'hex'
+                ),
                 protocol_version: '0.0.29',
-                software_version: '1.0rc2',
+                software_version: '0.2.2',
                 server_port: 58444,
                 node_type: 1,
             });
 
+            // 01 - message type
+            // 00000036 - length of the rest of the message, ignoring the 00 at the end... must be part of how streamable works
+            // d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35 = network_id = testnet
+            // 00000006 = length of protocol version (6)
+            // 302e302e3239 = protocol version = 0.0.29
+            // 00000005 = length of software version (5)
+            // 302e322e32 = software version - 0.2.2
+            // e44c = port = 58444
+            // 01 = node type = full node
+            // 0 = ???? must be to signal the end of the message
             expect(encodedHandshake.toString('hex')).toMatchInlineSnapshot(
-                `"01746573746e657400000006302e302e323900000006312e30726332e44c01"`
+                `"0100000036d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab3500000006302e302e323900000005302e322e32e44c0100"`
             );
         });
 
@@ -40,7 +53,7 @@ describe('encoder', () => {
             const encodedHandshakeAck = encodeMessage(2, {});
 
             expect(encodedHandshakeAck.toString('hex')).toMatchInlineSnapshot(
-                `"02"`
+                `"020000000000"`
             );
         });
 
@@ -48,7 +61,7 @@ describe('encoder', () => {
             const encodedRequestPeers = encodeMessage(40, {});
 
             expect(encodedRequestPeers.toString('hex')).toMatchInlineSnapshot(
-                `"28"`
+                `"280000000000"`
             );
         });
 
@@ -74,7 +87,7 @@ describe('encoder', () => {
             });
 
             expect(encodedRespondPeers.toString('hex')).toMatchInlineSnapshot(
-                `"2900000003000000096c6f63616c686f7374e44c00000000000030390000000d73756d6f2e636869612e6e6574e44c000000000098967f000000093132372e302e302e32e44c00000000000f1206"`
+                `"290000004d00000003000000096c6f63616c686f7374e44c00000000000030390000000d73756d6f2e636869612e6e6574e44c000000000098967f000000093132372e302e302e32e44c00000000000f120600"`
             );
         });
     });
@@ -82,18 +95,24 @@ describe('encoder', () => {
     describe('decodeMessages', () => {
         it('decodes handshake message', () => {
             const encodedHandshake = encodeMessage(1, {
-                network_id: 'testnet',
+                network_id: Buffer.from(
+                    'd4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35',
+                    'hex'
+                ),
                 protocol_version: '0.0.29',
-                software_version: '1.0rc2',
+                software_version: '0.2.2',
                 server_port: 58444,
                 node_type: 1,
             });
             const decodedHandshake = decodeMessage(encodedHandshake);
 
             expect(decodedHandshake).toEqual({
-                network_id: 'testnet',
+                network_id: Buffer.from(
+                    'd4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35',
+                    'hex'
+                ),
                 protocol_version: '0.0.29',
-                software_version: '1.0rc2',
+                software_version: '0.2.2',
                 server_port: 58444,
                 node_type: 1,
             });
