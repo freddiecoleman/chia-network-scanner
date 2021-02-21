@@ -1,36 +1,6 @@
 import { parseOptions } from '../options';
 
 describe('options parser', () => {
-    it('rejects nodeId that is not 32 characters in length', () => {
-        expect(() =>
-            parseOptions({
-                network: {
-                    networkId: 'testnet',
-                    protocolVersion: '0.0.29',
-                    softwareVersion: '1.0rc2'
-                },
-                node: {
-                    hostname: 'chia.net',
-                    port: 123,
-                },
-                peer: {
-                    nodeId: '1337-network-scanner',
-                    nodeType: 1,
-                },
-                connectionTimeout: 2500,
-                concurrency: 50,
-                certPath: '/root/cert.crt',
-                keyPath: '/root/key.key'
-            })
-        ).toThrowErrorMatchingInlineSnapshot(`
-            "1 validation issue(s)
-
-              Issue #0: too_small at peer.nodeId
-              Should be at least 32 characters
-            "
-        `);
-    });
-
     it('rejects concurrency greater than 255', () => {
         expect(() =>
             parseOptions({
@@ -44,7 +14,6 @@ describe('options parser', () => {
                     port: 123,
                 },
                 peer: {
-                    nodeId: '1337-network-scanner............',
                     nodeType: 1,
                 },
                 connectionTimeout: 2500,
@@ -74,7 +43,6 @@ describe('options parser', () => {
                     port: 123,
                 },
                 peer: {
-                    nodeId: '1337-network-scanner............',
                     nodeType: 1,
                 },
                 connectionTimeout: 0,
@@ -104,7 +72,6 @@ describe('options parser', () => {
                     port: 123,
                 },
                 peer: {
-                    nodeId: '1337-network-scanner............',
                     nodeType: 1,
                 },
                 connectionTimeout: 60000,
@@ -134,7 +101,6 @@ describe('options parser', () => {
                     port: 9999999,
                 },
                 peer: {
-                    nodeId: '1337-network-scanner............',
                     nodeType: 1,
                 },
                 connectionTimeout: 5000,
@@ -163,7 +129,6 @@ describe('options parser', () => {
                 port: 123,
             },
             peer: {
-                nodeId: '1337-network-scanner............',
                 nodeType: 1,
             },
             connectionTimeout: 2500,
@@ -185,7 +150,6 @@ describe('options parser', () => {
                 "port": 123,
               },
               "peer": Object {
-                "nodeId": "1337-network-scanner............",
                 "nodeType": 1,
               },
             }

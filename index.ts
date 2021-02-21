@@ -87,7 +87,6 @@ class ChiaNetworkScanner {
             networkId: network.networkId,
             protocolVersion: network.protocolVersion,
             softwareVersion: '',
-            nodeId: peerOptions.nodeId,
             nodeType: peerOptions.nodeType,
             hostname: peer.hostname,
             port: peer.port,

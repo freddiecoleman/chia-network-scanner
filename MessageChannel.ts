@@ -7,7 +7,6 @@ interface MessageChannelOptions {
     networkId: NetworkId;
     protocolVersion: ProtocolVersion;
     softwareVersion: string;
-    nodeId: string;
     nodeType: number;
     hostname: string;
     port: number;
@@ -33,7 +32,6 @@ class MessageChannel {
     public readonly networkId: NetworkId;
     public readonly protocolVersion: ProtocolVersion;
     public readonly softwareVersion: string;
-    public readonly nodeId: Buffer;
     public readonly nodeType: number;
     public readonly cert: Buffer;
     public readonly key: Buffer;
@@ -42,7 +40,6 @@ class MessageChannel {
         networkId,
         protocolVersion,
         softwareVersion,
-        nodeId,
         nodeType,
         hostname,
         port,
@@ -54,7 +51,6 @@ class MessageChannel {
         this.networkId = networkId;
         this.protocolVersion = protocolVersion;
         this.softwareVersion = softwareVersion;
-        this.nodeId = Buffer.from(nodeId);
         this.nodeType = nodeType;
         this.hostname = hostname;
         this.port = port;

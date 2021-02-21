@@ -27,7 +27,6 @@ interface NetworkOptions {
  * Details for this peer as it connects to the Chia network.
  */
 interface PeerOptions {
-    nodeId: string;
     nodeType: number;
 }
 
@@ -61,19 +60,15 @@ const nodeOptionsSchema = z.object({
 });
 
 const networkOptionsSchema = z.object({
-    networkId: z.union([
-        z.literal('testnet'),
-        z.literal('mainnet')
-    ]),
+    networkId: z
+        .string()
+        .min(32)
+        .max(32),
     protocolVersion: z.literal('0.0.29'),
     softwareVersion: z.string()
 });
 
 const peerOptionsSchema = z.object({
-    nodeId: z
-        .string()
-        .min(32)
-        .max(32),
     nodeType: z.number() // Todo: improve validation of this
 });
 

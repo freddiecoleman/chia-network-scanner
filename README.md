@@ -35,7 +35,6 @@ const chiaNetworkScanner = new ChiaNetworkScanner({
 
     // Identifies this peer on the network
     peer: {
-        nodeId: '1337-network-scanner............',
         nodeType: 1,
     },
 

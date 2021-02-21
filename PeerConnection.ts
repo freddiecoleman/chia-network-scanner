@@ -8,7 +8,6 @@ interface PeerConnectionOptions {
     networkId: NetworkId;
     protocolVersion: ProtocolVersion;
     softwareVersion: string;
-    nodeId: string;
     nodeType: number;
     hostname: string;
     port: number;
@@ -25,7 +24,6 @@ class PeerConnection {
         networkId,
         protocolVersion,
         softwareVersion,
-        nodeId,
         nodeType,
         hostname,
         port,
@@ -37,7 +35,6 @@ class PeerConnection {
             networkId,
             protocolVersion,
             softwareVersion,
-            nodeId,
             nodeType,
             hostname,
             port,
