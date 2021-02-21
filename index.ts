@@ -114,7 +114,7 @@ class ChiaNetworkScanner {
             // Close TCP connection
             await peerConnection.close();
         } catch (err) {
-            log.err(err);
+            log.error(err);
         }
     }
 }
