@@ -1,10 +1,9 @@
-import fs from 'fs';
 import WebSocket from 'ws';
 import { log } from './log';
-import { NetworkId, ProtocolVersion } from './options';
+import { ProtocolVersion } from './options';
 
 interface MessageChannelOptions {
-    networkId: NetworkId;
+    networkId: string;
     protocolVersion: ProtocolVersion;
     softwareVersion: string;
     nodeType: number;
@@ -29,7 +28,7 @@ class MessageChannel {
     public readonly hostname: string;
     public readonly port: number;
     public readonly connectionTimeout: number;
-    public readonly networkId: NetworkId;
+    public readonly networkId: string;
     public readonly protocolVersion: ProtocolVersion;
     public readonly softwareVersion: string;
     public readonly nodeType: number;
