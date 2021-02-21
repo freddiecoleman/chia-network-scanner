@@ -1,6 +1,5 @@
 import pino from 'pino';
 
-// Todo: Configurable log levels
-const log = pino();
+const log = pino({ level: process.env.LOG_LEVEL || 'info' });
 
 export { log };

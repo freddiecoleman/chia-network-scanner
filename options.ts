@@ -1,10 +1,7 @@
 import * as z from 'zod';
 
-// There will soon be 3 networks.
-type NetworkId = 'testnet' | 'mainnet';
-
 // For now we will just try to keep up to date with the latest version. Should be easy as we do not implement the entire protocol.
-type ProtocolVersion = '0.0.18';
+type ProtocolVersion = '0.0.29';
 
 /**
  * Connection options for connecting to a full Chia node with the peer protocol.
@@ -18,15 +15,15 @@ interface NodeOptions {
  * Network and protocol version to connect with.
  */
 interface NetworkOptions {
-    networkId: NetworkId;
+    networkId: string;
     protocolVersion: ProtocolVersion;
+    softwareVersion: string;
 }
 
 /**
  * Details for this peer as it connects to the Chia network.
  */
 interface PeerOptions {
-    nodeId: string;
     nodeType: number;
 }
 
@@ -37,10 +34,18 @@ interface NetworkScannerOptions {
     node: NodeOptions;
     network: NetworkOptions;
     peer: PeerOptions;
+
     // Time within which a peer much respond to peer protocol handshake before bailing in ms.
     connectionTimeout: number;
+
     // Number of peers to scan at the same time (bigger is faster but uses more sockets and memory)
     concurrency: number;
+
+    // Path to full node public cert
+    certPath: string;
+
+    // Path to full node public key
+    keyPath: string;
 }
 
 const nodeOptionsSchema = z.object({
@@ -52,18 +57,15 @@ const nodeOptionsSchema = z.object({
 });
 
 const networkOptionsSchema = z.object({
-    networkId: z.union([
-        z.literal('testnet'),
-        z.literal('mainnet')
-    ]),
-    protocolVersion: z.literal('0.0.18')
+    networkId: z
+        .string()
+        .min(64)
+        .max(64),
+    protocolVersion: z.literal('0.0.29'),
+    softwareVersion: z.string()
 });
 
 const peerOptionsSchema = z.object({
-    nodeId: z
-        .string()
-        .min(32)
-        .max(32),
     nodeType: z.number() // Todo: improve validation of this
 });
 
@@ -78,14 +80,15 @@ const networkScannerOptionsSchema = z.object({
     concurrency: z
         .number()
         .min(1)
-        .max(255) // Fairly arbitrary, may want to increase this later ¯\_(ツ)_/¯
+        .max(255), // Fairly arbitrary, may want to increase this later ¯\_(ツ)_/¯
+    certPath: z.string(),
+    keyPath: z.string()
 });
 
 const parseOptions = (options: NetworkScannerOptions): NetworkScannerOptions => networkScannerOptionsSchema.parse(options);
 
 export {
     NetworkScannerOptions,
-    NetworkId,
     ProtocolVersion,
     parseOptions
 };

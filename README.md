@@ -22,8 +22,9 @@ import { ChiaNetworkScanner } from 'chia-network-scanner';
 const chiaNetworkScanner = new ChiaNetworkScanner({
     // The network to scan and protocol to use
     network: {
-        networkId: 'testnet',
-        protocolVersion: '0.0.18',
+        networkId: 'd4735eaa2ffe1cceeeef59718b9eed0ee19cc7d8bbc51ff0da226611ec44a555',
+        protocolVersion: '0.0.29',
+        softwareVersion: '0.2.2'
     },
 
     // The first node to scan, you don't have to use localhost but it works if you are running a Chia node locally
@@ -34,7 +35,6 @@ const chiaNetworkScanner = new ChiaNetworkScanner({
 
     // Identifies this peer on the network
     peer: {
-        nodeId: '1337-network-scanner............', // must be 32 characters long
         nodeType: 1,
     },
 
@@ -43,6 +43,12 @@ const chiaNetworkScanner = new ChiaNetworkScanner({
 
     // Number of peers to scan concurrently. Bigger is faster but uses more sockets and memory :)
     concurrency: 50,
+
+    // Full node public key
+    keyPath: '/root/123.key',
+
+    // Full node public cert
+    certPath: '/root/123.crt'
 });
 
 const peers = await chiaNetworkScanner.scan();

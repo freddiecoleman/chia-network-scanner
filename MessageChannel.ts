@@ -1,14 +1,16 @@
-import tls from 'tls';
+import WebSocket from 'ws';
 import { log } from './log';
-import { NetworkId, ProtocolVersion } from './options';
+import { ProtocolVersion } from './options';
 
 interface MessageChannelOptions {
-    networkId: NetworkId;
+    networkId: string;
     protocolVersion: ProtocolVersion;
-    nodeId: string;
+    softwareVersion: string;
     nodeType: number;
     hostname: string;
     port: number;
+    cert: Buffer;
+    key: Buffer;
     onMessage: (message: Buffer) => void;
     connectionTimeout: number;
 }
@@ -19,48 +21,83 @@ interface Message {
     d: any;
 }
 
-const TCP_CLOSE_TIMEOUT = 5000;
-
 class MessageChannel {
     private readonly onMessage: (message: Buffer) => void;
-    private readonly tlsClient: tls.TLSSocket;
+    private ws: WebSocket | null = null;
     private inboundDataBuffer: Buffer = Buffer.from([]);
     public readonly hostname: string;
     public readonly port: number;
     public readonly connectionTimeout: number;
-    public readonly networkId: NetworkId;
+    public readonly networkId: string;
     public readonly protocolVersion: ProtocolVersion;
-    public readonly nodeId: Buffer;
+    public readonly softwareVersion: string;
     public readonly nodeType: number;
+    public readonly cert: Buffer;
+    public readonly key: Buffer;
 
     public constructor({
         networkId,
         protocolVersion,
-        nodeId,
+        softwareVersion,
         nodeType,
         hostname,
         port,
         onMessage,
-        connectionTimeout
+        connectionTimeout,
+        cert,
+        key
     }: MessageChannelOptions) {
         this.networkId = networkId;
         this.protocolVersion = protocolVersion;
-        this.nodeId = Buffer.from(nodeId);
+        this.softwareVersion = softwareVersion;
         this.nodeType = nodeType;
         this.hostname = hostname;
         this.port = port;
         this.onMessage = onMessage;
         this.connectionTimeout = connectionTimeout;
-        this.tlsClient = tls.connect(port, hostname, { rejectUnauthorized: false });
+        this.cert = cert;
+        this.key = key;
+    }
 
-        this.tlsClient.on('data', (data: Buffer) => {
-            this.inboundDataBuffer = Buffer.concat([this.inboundDataBuffer, data]);
+    public async connect(): Promise<void> {
+        return new Promise(resolve => {
+            log.info(`Attempting websocket connection to wss://${this.hostname}:${this.port}/ws`);
 
-            const length = this.inboundDataBuffer.readUIntBE(0, 4);
-            const messageStreamed = this.inboundDataBuffer.byteLength - 4 === length;
-            const bufferOverflow = this.inboundDataBuffer.byteLength - 4 > length;
+            this.ws = new WebSocket(`wss://${this.hostname}:${this.port}/ws`, {
+                rejectUnauthorized: false,
+                cert: this.cert,
+                key: this.key
+            });
+            this.ws.on('message', (data: Buffer): void => this.messageHandler(data));
+            this.ws.on('error', (err: Error): void => this.onClose(err));
+            this.ws.on('close', (_, reason) => this.onClose(new Error(reason)));
+            this.ws.on('open', () => {
+                this.onConnected();
 
-            if (messageStreamed) {
+                resolve();
+            });
+        });
+    }
+
+    public sendMessage(message: Buffer): void {
+        this.ws?.send(message);
+    }
+
+    public close(): void {
+        this.ws?.close();
+    }
+
+    private messageHandler(data: Buffer): void {
+        this.inboundDataBuffer = Buffer.concat([this.inboundDataBuffer, data]);
+
+        // Buffer is big enough to contain the length
+        if (this.inboundDataBuffer.byteLength >= 5) {
+            const messageType = data[0];
+            const messageLength = data.readUInt32BE(1);
+            const messageReady = data.byteLength === messageLength + 6;
+            const bufferOverflow = data.byteLength > messageLength + 6;
+
+            if (messageReady) {
                 this.onMessage(this.inboundDataBuffer);
 
                 this.inboundDataBuffer = Buffer.from([]);
@@ -69,26 +106,7 @@ class MessageChannel {
                 // Depending on what they are doing this could happen many times in a row but should eventually recover
                 this.inboundDataBuffer = Buffer.from([]);
             }
-        });
-
-        this.tlsClient.on('close', () => this.onClose());
-        this.tlsClient.on('error', err => this.onClose(err));
-        this.tlsClient.on('secureConnect', () => this.onConnected());
-    }
-
-    public sendMessage(message: Buffer): void {
-        this.tlsClient.write(message);
-    }
-
-    public close(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => reject(new Error(`Connection did not close within ${(TCP_CLOSE_TIMEOUT / 1000).toFixed(2)} seconds`)), TCP_CLOSE_TIMEOUT);
-
-            this.tlsClient.end(() => {
-                clearTimeout(timeout);
-                resolve();
-            });
-        });
+        }
     }
 
     private onConnected(): void {

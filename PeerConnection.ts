@@ -1,48 +1,65 @@
 import { log } from './log';
 import { MessageChannel } from './MessageChannel';
-import { NetworkId, ProtocolVersion } from './options';
+import { ProtocolVersion } from './options';
 import { Peer } from './peer';
-import { decodePeer, decodeMessage, encodeMessage } from './encoder';
+import { decodeMessage, encodeMessage, ProtocolMessageTypes } from './encoder';
 
 interface PeerConnectionOptions {
-    networkId: NetworkId;
+    networkId: string;
     protocolVersion: ProtocolVersion;
-    nodeId: string;
+    softwareVersion: string;
     nodeType: number;
     hostname: string;
     port: number;
     connectionTimeout: number;
+    cert: Buffer;
+    key: Buffer;
 }
 
 class PeerConnection {
     private readonly messageChannel: MessageChannel;
-    private readonly messageHandlers: Map<string, Function> = new Map();
+    private readonly messageHandlers: Map<number, Function> = new Map();
 
     public constructor({
         networkId,
         protocolVersion,
-        nodeId,
+        softwareVersion,
         nodeType,
         hostname,
         port,
-        connectionTimeout
+        connectionTimeout,
+        cert,
+        key
     }: PeerConnectionOptions) {
         this.messageChannel = new MessageChannel({
             networkId,
             protocolVersion,
-            nodeId,
+            softwareVersion,
             nodeType,
             hostname,
             port,
             connectionTimeout,
-            onMessage: data => this.onMessage(data)
+            onMessage: data => this.onMessage(data),
+            cert,
+            key
         });
+    }
 
-        this.addMessageHandler('ping', (ping: { nonce: Buffer }) => {
-            // No-op is fine for now
-        });
-        this.addMessageHandler('pong', (pong: { nonce: Buffer }) => {
-            // No-op is fine for now
+    public async connect(): Promise<void> {
+        return new Promise(async(resolve, reject) => {
+            const timeout = setTimeout(() => reject(new Error('Failed to connect to peer within 2 seconds')), 2000);
+
+            try {
+                await this.messageChannel.connect();
+
+                // Connected within timeout
+                clearTimeout(timeout);
+
+                resolve();
+            } catch (err) {
+                clearTimeout(timeout);
+                reject(err);
+            }
         });
     }
 
@@ -50,29 +67,29 @@ class PeerConnection {
      * Chia application level handshake required before using the peer protocol.
      */
     public async handshake(): Promise<this> {
-        const { hostname, port, connectionTimeout, networkId, protocolVersion, nodeId, nodeType } = this.messageChannel;
+        const { hostname, port, connectionTimeout, networkId, protocolVersion, softwareVersion, nodeType } = this.messageChannel;
 
         return new Promise(async(resolve, reject) => {
             const timeout = setTimeout(() => reject(new Error(`${hostname}:${port} did not respond to handshake within ${(connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), connectionTimeout);
 
             // Handle handshake response messages
             const handshakeResponse = [
-                this.expectMessage('handshake'),
-                this.expectMessage('handshake_ack')
+                this.expectMessage(ProtocolMessageTypes.handshake),
+                this.expectMessage(ProtocolMessageTypes.handshake_ack)
             ];
 
             // Initiate handshake
-            this.sendMessage('handshake', {
-                network_id: networkId,
-                version: protocolVersion,
-                node_id: nodeId,
-                server_port: 8444,
+            this.sendMessage(ProtocolMessageTypes.handshake, {
+                network_id: Buffer.from(networkId, 'hex'),
+                protocol_version: protocolVersion,
+                software_version: softwareVersion,
+                server_port: port,
                 node_type: nodeType
             });
 
             try {
                 // Wait for handshake response
-                await Promise.all(handshakeResponse);
+                await Promise.race(handshakeResponse);
             } catch (err) {
                 return reject(err);
             }
@@ -80,15 +97,12 @@ class PeerConnection {
             // Handshake completed within timeout
             clearTimeout(timeout);
 
-            // Acknowledge receipt of handshake from peer
-            this.sendMessage('handshake_ack', {});
-
             // We can now use the peer protocol
             resolve(this);
         });
     }
 
-    public sendMessage(messageType: string, data: any) {
+    public sendMessage(messageType: number, data: any) {
         const message = encodeMessage(messageType, data);
 
         log.info(`Sending ${messageType} message`);
@@ -100,28 +114,26 @@ class PeerConnection {
      * Get the peers of this peer.
      */
     public getPeers(): Promise<Peer[]> {
-        const { hostname, port, connectionTimeout, networkId, protocolVersion, nodeId, nodeType } = this.messageChannel;
+        const { hostname, port, connectionTimeout } = this.messageChannel;
 
         return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => reject(new Error(`${hostname}${port} did not respond after ${(connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), connectionTimeout);
+            const timeout = setTimeout(() => reject(new Error(`${hostname}:${port} did not respond after ${(connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), connectionTimeout);
     
-            this.addMessageHandler('respond_peers_full_node', (respondPeers: any) => {
-                const peers = respondPeers.peer_list.map((encodedPeer: Buffer) => decodePeer(encodedPeer));
-    
+            this.addMessageHandler(ProtocolMessageTypes.respond_peers, (respondPeers: any) => {
                 clearTimeout(timeout);
 
-                resolve(peers);
+                resolve(respondPeers.peer_list);
             });
     
-            this.sendMessage('request_peers', {});
+            this.sendMessage(ProtocolMessageTypes.request_peers, {});
         });
     }
 
-    public close(): Promise<void> {
+    public close(): void {
         return this.messageChannel.close();
     }
 
-    private addMessageHandler(messageType: string, handler: Function) {
+    private addMessageHandler(messageType: number, handler: Function) {
         log.debug(`Adding message handler for ${messageType} messages`);
 
         this.messageHandlers.set(messageType, handler);
@@ -129,14 +141,12 @@ class PeerConnection {
 
     private onMessage(data: Buffer): void {
         try {
+            const messageType = data[0];
             const message = decodeMessage(data);
-            const messageType = message.f;
             const handler = this.messageHandlers.get(messageType);
 
-            log.debug(`Succesfully decoded ${messageType}`);
-
             if (handler) {
-                return handler(message.d);
+                return handler(message);
             }
 
             log.warn(`No handler for ${messageType} message. Discarding it.`);
@@ -148,17 +158,17 @@ class PeerConnection {
     }
 
     /**
-     * Expects a message to be received within a timeout.
+     * Expects a message of a messageType to be received within a timeout.
      *
-     * @param message expected
+     * @param messageType expected
      */
-    private expectMessage(message: string): Promise<void> {
+    private expectMessage(messageType: number): Promise<void> {
         const { hostname, port, connectionTimeout } = this.messageChannel;
 
         return new Promise((resolve, reject) => {
-            const timeout = setTimeout(() => reject(new Error(`${hostname}:${port} did not receive ${message} within ${(connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), connectionTimeout);
+            const timeout = setTimeout(() => reject(new Error(`${hostname}:${port} did not receive ${messageType} message within ${(connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), connectionTimeout);
         
-            this.addMessageHandler(message, () => {
+            this.addMessageHandler(messageType, () => {
                 clearTimeout(timeout);
                 resolve();
             });

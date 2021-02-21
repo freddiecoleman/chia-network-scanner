@@ -1,3 +1,4 @@
+import fs from 'fs';
 import * as async from 'async';
 import { log } from './log';
 import { NetworkScannerOptions, parseOptions } from './options';
@@ -57,7 +58,7 @@ class ChiaNetworkScanner {
         const peerLogger = log.child({
             ...proposedPeer
         });
-        const { connectionTimeout, network, peer: peerOptions } = this.options;
+        const { connectionTimeout, network, peer: peerOptions, certPath, keyPath } = this.options;
         const peerHash = proposedPeer.hash();
 
         if (!this.peers.has(peerHash)) {
@@ -85,26 +86,35 @@ class ChiaNetworkScanner {
         const peerConnection = new PeerConnection({
             networkId: network.networkId,
             protocolVersion: network.protocolVersion,
-            nodeId: peerOptions.nodeId,
+            softwareVersion: network.softwareVersion,
             nodeType: peerOptions.nodeType,
             hostname: peer.hostname,
             port: peer.port,
-            connectionTimeout
+            connectionTimeout,
+            cert: fs.readFileSync(certPath),
+            key: fs.readFileSync(keyPath)
         });
 
-        // Performs application level handshake with peer
-        await peerConnection.handshake();
-
-        const peers = await peerConnection.getPeers();
-
-        // Enqueue peers of peer for async processing
-        this.queue.push(peers);
+        peerLogger.info('Establishing websocket connection');
 
         try {
+             // Establish websocket connection
+            await peerConnection.connect();
+
+            peerLogger.info('Websocket connection established');
+
+            // Performs application level handshake with peer
+            await peerConnection.handshake();
+
+            const peers = await peerConnection.getPeers();
+
+            // Enqueue peers of peer for async processing
+            this.queue.push(peers);
+
             // Close TCP connection
             await peerConnection.close();
         } catch (err) {
-            log.err(err);
+            log.error(err);
         }
     }
 }
