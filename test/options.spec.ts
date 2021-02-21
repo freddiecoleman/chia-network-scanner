@@ -7,6 +7,7 @@ describe('options parser', () => {
                 network: {
                     networkId: 'testnet',
                     protocolVersion: '0.0.29',
+                    softwareVersion: '1.0rc2'
                 },
                 node: {
                     hostname: 'chia.net',
@@ -36,6 +37,7 @@ describe('options parser', () => {
                 network: {
                     networkId: 'testnet',
                     protocolVersion: '0.0.29',
+                    softwareVersion: '1.0rc2'
                 },
                 node: {
                     hostname: 'chia.net',
@@ -65,6 +67,7 @@ describe('options parser', () => {
                 network: {
                     networkId: 'testnet',
                     protocolVersion: '0.0.29',
+                    softwareVersion: '1.0rc2'
                 },
                 node: {
                     hostname: 'chia.net',
@@ -94,6 +97,7 @@ describe('options parser', () => {
                 network: {
                     networkId: 'testnet',
                     protocolVersion: '0.0.29',
+                    softwareVersion: '1.0rc2'
                 },
                 node: {
                     hostname: 'chia.net',
@@ -123,6 +127,7 @@ describe('options parser', () => {
                 network: {
                     networkId: 'testnet',
                     protocolVersion: '0.0.29',
+                    softwareVersion: '1.0rc2'
                 },
                 node: {
                     hostname: 'chia.net',
@@ -151,6 +156,7 @@ describe('options parser', () => {
             network: {
                 networkId: 'testnet',
                 protocolVersion: '0.0.29',
+                softwareVersion: '1.0rc2'
             },
             node: {
                 hostname: 'chia.net',

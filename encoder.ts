@@ -198,5 +198,6 @@ export {
     encodeMessage,
     decodeMessage,
     encodeString,
-    decodeString
+    decodeString,
+    ProtocolMessageTypes
 };
