@@ -67,9 +67,13 @@ class PeerConnection {
                 this.expectMessage(ProtocolMessageTypes.handshake_ack)
             ];
 
+            const networkIdBuffer = Buffer.alloc(32);
+
+            networkIdBuffer.write(networkId);
+
             // Initiate handshake
             this.sendMessage(ProtocolMessageTypes.handshake, {
-                network_id: networkId,
+                network_id: networkIdBuffer,
                 protocol_version: protocolVersion,
                 software_version: softwareVersion,
                 server_port: 8444,
@@ -106,7 +110,7 @@ class PeerConnection {
      * Get the peers of this peer.
      */
     public getPeers(): Promise<Peer[]> {
-        const { hostname, port, connectionTimeout, networkId, protocolVersion, nodeId, nodeType } = this.messageChannel;
+        const { hostname, port, connectionTimeout } = this.messageChannel;
 
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => reject(new Error(`${hostname}${port} did not respond after ${(connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), connectionTimeout);

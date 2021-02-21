@@ -22,7 +22,7 @@ import { ChiaNetworkScanner } from 'chia-network-scanner';
 const chiaNetworkScanner = new ChiaNetworkScanner({
     // The network to scan and protocol to use
     network: {
-        networkId: 'testnet',
+        networkId: '1337-network-scanner............',
         protocolVersion: '0.0.29',
         softwareVersion: '1.0rc2'
     },
@@ -35,7 +35,7 @@ const chiaNetworkScanner = new ChiaNetworkScanner({
 
     // Identifies this peer on the network
     peer: {
-        nodeId: '1337-network-scanner............', // must be 32 characters long
+        nodeId: '1337-network-scanner............',
         nodeType: 1,
     },
 
