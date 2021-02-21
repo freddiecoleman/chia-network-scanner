@@ -73,7 +73,7 @@ class PeerConnection {
 
             // Initiate handshake
             this.sendMessage(ProtocolMessageTypes.handshake, {
-                network_id: Buffer.from(networkId, 'utf-8'),
+                network_id: Buffer.from(networkId, 'hex'),
                 protocol_version: protocolVersion,
                 software_version: softwareVersion,
                 server_port: port,

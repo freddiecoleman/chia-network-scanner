@@ -5,9 +5,10 @@ describe('options parser', () => {
         expect(() =>
             parseOptions({
                 network: {
-                    networkId: 'testnet',
+                    networkId:
+                        'd4735eaa2ffe1cceeeef59718b9eed0ee19cc7d8bbc51ff0da226611ec44a555',
                     protocolVersion: '0.0.29',
-                    softwareVersion: '1.0rc2'
+                    softwareVersion: '1.0rc2',
                 },
                 node: {
                     hostname: 'chia.net',
@@ -19,7 +20,7 @@ describe('options parser', () => {
                 connectionTimeout: 2500,
                 concurrency: 10000,
                 certPath: '/root/cert.crt',
-                keyPath: '/root/key.key'
+                keyPath: '/root/key.key',
             })
         ).toThrowErrorMatchingInlineSnapshot(`
             "1 validation issue(s)
@@ -34,9 +35,10 @@ describe('options parser', () => {
         expect(() =>
             parseOptions({
                 network: {
-                    networkId: 'testnet',
+                    networkId:
+                        'd4735eaa2ffe1cceeeef59718b9eed0ee19cc7d8bbc51ff0da226611ec44a555',
                     protocolVersion: '0.0.29',
-                    softwareVersion: '1.0rc2'
+                    softwareVersion: '1.0rc2',
                 },
                 node: {
                     hostname: 'chia.net',
@@ -48,7 +50,7 @@ describe('options parser', () => {
                 connectionTimeout: 0,
                 concurrency: 100,
                 certPath: '/root/cert.crt',
-                keyPath: '/root/key.key'
+                keyPath: '/root/key.key',
             })
         ).toThrowErrorMatchingInlineSnapshot(`
             "1 validation issue(s)
@@ -63,9 +65,10 @@ describe('options parser', () => {
         expect(() =>
             parseOptions({
                 network: {
-                    networkId: 'testnet',
+                    networkId:
+                        'd4735eaa2ffe1cceeeef59718b9eed0ee19cc7d8bbc51ff0da226611ec44a555',
                     protocolVersion: '0.0.29',
-                    softwareVersion: '1.0rc2'
+                    softwareVersion: '1.0rc2',
                 },
                 node: {
                     hostname: 'chia.net',
@@ -77,7 +80,7 @@ describe('options parser', () => {
                 connectionTimeout: 60000,
                 concurrency: 100,
                 certPath: '/root/cert.crt',
-                keyPath: '/root/key.key'
+                keyPath: '/root/key.key',
             })
         ).toThrowErrorMatchingInlineSnapshot(`
             "1 validation issue(s)
@@ -92,9 +95,10 @@ describe('options parser', () => {
         expect(() =>
             parseOptions({
                 network: {
-                    networkId: 'testnet',
+                    networkId:
+                        'd4735eaa2ffe1cceeeef59718b9eed0ee19cc7d8bbc51ff0da226611ec44a555',
                     protocolVersion: '0.0.29',
-                    softwareVersion: '1.0rc2'
+                    softwareVersion: '1.0rc2',
                 },
                 node: {
                     hostname: 'chia.net',
@@ -106,7 +110,7 @@ describe('options parser', () => {
                 connectionTimeout: 5000,
                 concurrency: 100,
                 certPath: '/root/cert.crt',
-                keyPath: '/root/key.key'
+                keyPath: '/root/key.key',
             })
         ).toThrowErrorMatchingInlineSnapshot(`
             "1 validation issue(s)
@@ -120,9 +124,10 @@ describe('options parser', () => {
     it('pases valid options', () => {
         const options = parseOptions({
             network: {
-                networkId: 'testnet',
+                networkId:
+                    'd4735eaa2ffe1cceeeef59718b9eed0ee19cc7d8bbc51ff0da226611ec44a555',
                 protocolVersion: '0.0.29',
-                softwareVersion: '1.0rc2'
+                softwareVersion: '1.0rc2',
             },
             node: {
                 hostname: 'chia.net',
@@ -134,16 +139,19 @@ describe('options parser', () => {
             connectionTimeout: 2500,
             concurrency: 50,
             certPath: '/root/cert.crt',
-            keyPath: '/root/key.key'
+            keyPath: '/root/key.key',
         });
 
         expect(options).toMatchInlineSnapshot(`
             Object {
+              "certPath": "/root/cert.crt",
               "concurrency": 50,
               "connectionTimeout": 2500,
+              "keyPath": "/root/key.key",
               "network": Object {
-                "networkId": "testnet",
+                "networkId": "d4735eaa2ffe1cceeeef59718b9eed0ee19cc7d8bbc51ff0da226611ec44a555",
                 "protocolVersion": "0.0.29",
+                "softwareVersion": "1.0rc2",
               },
               "node": Object {
                 "hostname": "chia.net",
