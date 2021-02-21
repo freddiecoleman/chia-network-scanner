@@ -86,7 +86,7 @@ class ChiaNetworkScanner {
         const peerConnection = new PeerConnection({
             networkId: network.networkId,
             protocolVersion: network.protocolVersion,
-            softwareVersion: '',
+            softwareVersion: network.softwareVersion,
             nodeType: peerOptions.nodeType,
             hostname: peer.hostname,
             port: peer.port,

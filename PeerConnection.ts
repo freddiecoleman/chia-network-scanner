@@ -64,16 +64,19 @@ class PeerConnection {
                 this.expectMessage(ProtocolMessageTypes.handshake_ack)
             ];
 
-            const networkIdBuffer = Buffer.alloc(32);
-
-            networkIdBuffer.write(networkId);
+            console.log(JSON.stringify({
+                protocol_version: protocolVersion,
+                software_version: softwareVersion,
+                server_port: port,
+                node_type: nodeType
+            }));
 
             // Initiate handshake
             this.sendMessage(ProtocolMessageTypes.handshake, {
-                network_id: networkIdBuffer,
+                network_id: Buffer.from(networkId, 'utf-8'),
                 protocol_version: protocolVersion,
                 software_version: softwareVersion,
-                server_port: 8444,
+                server_port: port,
                 node_type: nodeType
             });
 
