@@ -1,6 +1,7 @@
 import { decodeMessage } from '../encoder';
 import { encodeMessage } from '../encoder';
 import { decodeString, encodeString } from '../encoder';
+import { Peer } from '../peer';
 
 describe('encoder', () => {
     describe('encodeString', () => {
@@ -50,6 +51,32 @@ describe('encoder', () => {
                 `"28"`
             );
         });
+
+        it('encodes respond_peers message', () => {
+            const encodedRespondPeers = encodeMessage(41, {
+                peer_list: [
+                    new Peer({
+                        hostname: 'localhost',
+                        port: 58444,
+                        timestamp: 12345,
+                    }),
+                    new Peer({
+                        hostname: 'sumo.chia.net',
+                        port: 58444,
+                        timestamp: 9999999,
+                    }),
+                    new Peer({
+                        hostname: '127.0.0.2',
+                        port: 58444,
+                        timestamp: 987654,
+                    }),
+                ],
+            });
+
+            expect(encodedRespondPeers.toString('hex')).toMatchInlineSnapshot(
+                `"2900000003000000096c6f63616c686f7374e44c00000000000030390000000d73756d6f2e636869612e6e6574e44c000000000098967f000000093132372e302e302e32e44c00000000000f1206"`
+            );
+        });
     });
 
     describe('decodeMessages', () => {
@@ -84,6 +111,54 @@ describe('encoder', () => {
             const decodedRequestPeers = decodeMessage(encodedRequestPeers);
 
             expect(decodedRequestPeers).toEqual({});
+        });
+
+        it('decodes respond_peers message', () => {
+            const encodedRespondPeers = encodeMessage(41, {
+                peer_list: [
+                    new Peer({
+                        hostname: 'localhost',
+                        port: 58444,
+                        timestamp: 12345,
+                    }),
+                    new Peer({
+                        hostname: 'sumo.chia.net',
+                        port: 58444,
+                        timestamp: 9999999,
+                    }),
+                    new Peer({
+                        hostname: '127.0.0.2',
+                        port: 58444,
+                        timestamp: 987654,
+                    }),
+                ],
+            });
+            const decodedRespondPeers = decodeMessage(encodedRespondPeers);
+
+            expect(decodedRespondPeers).toMatchInlineSnapshot(`
+                Object {
+                  "peer_list": Array [
+                    Peer {
+                      "hostname": "localhost",
+                      "port": 58444,
+                      "timestamp": 12345,
+                      "visited": false,
+                    },
+                    Peer {
+                      "hostname": "sumo.chia.net",
+                      "port": 58444,
+                      "timestamp": 9999999,
+                      "visited": false,
+                    },
+                    Peer {
+                      "hostname": "127.0.0.2",
+                      "port": 58444,
+                      "timestamp": 987654,
+                      "visited": false,
+                    },
+                  ],
+                }
+            `);
         });
     });
 });

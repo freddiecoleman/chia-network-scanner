@@ -1,26 +1,11 @@
 import { Peer } from './peer';
 import { log } from './log';
-import { Message } from './MessageChannel';
 
 // There will soon be 3 networks.
 type NetworkId = 'testnet' | 'mainnet';
 
 // For now we will just try to keep up to date with the latest version. Should be easy as we do not implement the entire protocol.
 type ProtocolVersion = '0.0.29';
-
-
-// TODO: needs to be replaced by new non cbor decoder
-const decodePeer = (peer: Buffer): Peer => {
-    const hostname = peer.slice(0, 4).toString();
-    const port = peer.readUIntBE(4, 2);
-    const timestamp = parseInt(peer.readBigUInt64BE(6).toString(), 10);
-
-    return new Peer({
-        hostname,
-        port,
-        timestamp
-    });
-};
 
 const ProtocolMessageTypes = {
     handshake: 1,
@@ -40,6 +25,11 @@ interface Handshake {
 // TODO: needs to be replaced by non cbor version
 // Data must be any as we dont know what we are encoding
 const encodeMessage = (messageType: number, data: any): Buffer => {
+    // Messages that only have a type and don't contain any data
+    if (messageType === ProtocolMessageTypes.handshake_ack || messageType === ProtocolMessageTypes.request_peers) {
+        return Buffer.from([messageType]);
+    }
+
     if (messageType === ProtocolMessageTypes.handshake) {
         const { network_id, protocol_version, software_version, server_port, node_type } = data as Handshake;
 
@@ -57,9 +47,38 @@ const encodeMessage = (messageType: number, data: any): Buffer => {
         ]);
     }
 
-    // Messages that only have a type and don't contain any data
-    if (messageType === ProtocolMessageTypes.handshake_ack || messageType === ProtocolMessageTypes.request_peers) {
-        return Buffer.from([messageType]);
+    if (messageType === ProtocolMessageTypes.respond_peers) {
+        const { peer_list } = data as { peer_list: Peer[] };
+
+        const peerListSizeBuffer = Buffer.alloc(4);
+
+        peerListSizeBuffer.writeUIntBE(peer_list.length, 0, 4);
+
+        const peers = peer_list.reduce((accum, { hostname, port, timestamp }) => {
+            const portBuffer = Buffer.alloc(2);
+
+            portBuffer.writeUInt16BE(port);
+
+            const timestampBuffer = Buffer.alloc(8);
+
+            timestampBuffer.writeBigUInt64BE(BigInt(timestamp));
+
+            return Buffer.concat([
+                accum,
+                encodeString(hostname),
+                portBuffer,
+                timestampBuffer
+            ]);
+
+        }, Buffer.alloc(0));
+
+        return Buffer.concat([
+            Buffer.from([messageType]),
+            Buffer.concat([
+                peerListSizeBuffer,
+                peers
+            ])
+        ]);
     }
 
     throw new Error(`Could not encode message of type ${messageType}`);
@@ -68,6 +87,10 @@ const encodeMessage = (messageType: number, data: any): Buffer => {
 // TODO: needs to be replaced by non cbor version
 const decodeMessage = (message: Buffer): any => {
     const messageType = message[0];
+
+    if (messageType === ProtocolMessageTypes.handshake_ack || messageType === ProtocolMessageTypes.request_peers) {
+        return {};
+    }
 
     if (messageType === ProtocolMessageTypes.handshake) {
         let currentPos = 1;
@@ -101,8 +124,37 @@ const decodeMessage = (message: Buffer): any => {
         };
     }
 
-    if (messageType === ProtocolMessageTypes.handshake_ack || messageType === ProtocolMessageTypes.request_peers) {
-        return {};
+    if (messageType === ProtocolMessageTypes.respond_peers) {
+        const peer_list = [];
+        let currentPos = 1;
+
+        const peer_list_size = message.readUIntBE(currentPos, 4);
+
+        currentPos += 4;
+
+        for (let i = 0; i < peer_list_size; i++) {
+            const hostname = decodeString(message.slice(currentPos));
+
+            currentPos += 4 + hostname.length;
+
+            const port = message.readUInt16BE(currentPos);
+
+            currentPos += 2;
+
+            const timestamp = Number(message.readBigUInt64BE(currentPos));
+
+            currentPos += 8;
+
+            peer_list.push(
+                new Peer({
+                    hostname,
+                    port,
+                    timestamp
+                })
+            );
+        }
+
+        return { peer_list };
     }
 
     log.warn(`Could not decode message of type ${messageType}`);
@@ -110,10 +162,8 @@ const decodeMessage = (message: Buffer): any => {
     return null;
 };
 
-
 // https://github.com/Chia-Network/chia-blockchain/blob/main/src/util/streamable.py#L206
 const decodeString = (buffer: Buffer): string => {
-    // Extra length of string from first 4 bytes
     const str_size_bytes = buffer.readUIntBE(0, 4);
 
     if (str_size_bytes === 0) {
@@ -147,7 +197,6 @@ const encodeString = (str: string): Buffer => {
 export {
     encodeMessage,
     decodeMessage,
-    decodePeer,
     encodeString,
     decodeString
 };
