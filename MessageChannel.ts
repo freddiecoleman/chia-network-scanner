@@ -63,7 +63,12 @@ class MessageChannel {
         return new Promise(resolve => {
             log.info(`Attempting websocket connection to wss://${this.hostname}:${this.port}/ws`);
 
-            this.ws = new WebSocket(`wss://${this.hostname}:${this.port}/ws`, {
+            const ipv6 = this.hostname.includes(':');
+            const url = ipv6 ?
+                `wss://[${this.hostname}]:${this.port}/ws` :
+                `wss://${this.hostname}:${this.port}/ws`;
+
+            this.ws = new WebSocket(url, {
                 rejectUnauthorized: false,
                 cert: this.cert,
                 key: this.key
