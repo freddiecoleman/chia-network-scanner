@@ -10,10 +10,12 @@ describe('options parser', () => {
                     protocolVersion: '0.0.29',
                     softwareVersion: '1.0rc2',
                 },
-                node: {
-                    hostname: 'chia.net',
-                    port: 123,
-                },
+                startNodes: [
+                    {
+                        hostname: 'chia.net',
+                        port: 123,
+                    },
+                ],
                 peer: {
                     nodeType: 1,
                 },
@@ -40,10 +42,12 @@ describe('options parser', () => {
                     protocolVersion: '0.0.29',
                     softwareVersion: '1.0rc2',
                 },
-                node: {
-                    hostname: 'chia.net',
-                    port: 123,
-                },
+                startNodes: [
+                    {
+                        hostname: 'chia.net',
+                        port: 123,
+                    },
+                ],
                 peer: {
                     nodeType: 1,
                 },
@@ -70,10 +74,12 @@ describe('options parser', () => {
                     protocolVersion: '0.0.29',
                     softwareVersion: '1.0rc2',
                 },
-                node: {
-                    hostname: 'chia.net',
-                    port: 123,
-                },
+                startNodes: [
+                    {
+                        hostname: 'chia.net',
+                        port: 123,
+                    },
+                ],
                 peer: {
                     nodeType: 1,
                 },
@@ -100,10 +106,12 @@ describe('options parser', () => {
                     protocolVersion: '0.0.29',
                     softwareVersion: '1.0rc2',
                 },
-                node: {
-                    hostname: 'chia.net',
-                    port: 9999999,
-                },
+                startNodes: [
+                    {
+                        hostname: 'chia.net',
+                        port: 9999999,
+                    },
+                ],
                 peer: {
                     nodeType: 1,
                 },
@@ -115,7 +123,7 @@ describe('options parser', () => {
         ).toThrowErrorMatchingInlineSnapshot(`
             "1 validation issue(s)
 
-              Issue #0: too_big at node.port
+              Issue #0: too_big at startNodes.0.port
               Value should be less than or equal to 65535
             "
         `);
@@ -129,10 +137,12 @@ describe('options parser', () => {
                 protocolVersion: '0.0.29',
                 softwareVersion: '1.0rc2',
             },
-            node: {
-                hostname: 'chia.net',
-                port: 123,
-            },
+            startNodes: [
+                {
+                    hostname: 'chia.net',
+                    port: 123,
+                },
+            ],
             peer: {
                 nodeType: 1,
             },
@@ -153,13 +163,15 @@ describe('options parser', () => {
                 "protocolVersion": "0.0.29",
                 "softwareVersion": "1.0rc2",
               },
-              "node": Object {
-                "hostname": "chia.net",
-                "port": 123,
-              },
               "peer": Object {
                 "nodeType": 1,
               },
+              "startNodes": Array [
+                Object {
+                  "hostname": "chia.net",
+                  "port": 123,
+                },
+              ],
             }
         `);
     });

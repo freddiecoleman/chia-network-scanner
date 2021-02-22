@@ -27,17 +27,19 @@ class ChiaNetworkScanner {
         // Prevents caller from executing async scan more than once at a time
         this.scanInProgress = true;
 
-        const { node } = this.options;
+        const { startNodes } = this.options;
 
         // Reset peers from any previous scans
         this.peers = new Map<string, Peer>();
 
-        // The network scan is started from our own Chia node
-        this.queue.push(new Peer({
-            hostname: node.hostname,
-            port: node.port,
-            timestamp: Math.floor(Date.now() / 1000)
-        }), (e) => { console.log('fin', e); });
+        // The network scan is started from passed in start nodes
+        startNodes.forEach(node => {
+            this.queue.push(new Peer({
+                hostname: node.hostname,
+                port: node.port,
+                timestamp: Math.floor(Date.now() / 1000)
+            }), (e) => { console.log(`fin ${node.hostname}:${node.port}`, e); });
+        });
 
         await this.queue.drain();
 

@@ -31,7 +31,7 @@ interface PeerOptions {
  * Required configuration for using the Chia Network Scanner.
  */
 interface NetworkScannerOptions {
-    node: NodeOptions;
+    startNodes: NodeOptions[];
     network: NetworkOptions;
     peer: PeerOptions;
 
@@ -70,7 +70,7 @@ const peerOptionsSchema = z.object({
 });
 
 const networkScannerOptionsSchema = z.object({
-    node: nodeOptionsSchema,
+    startNodes: z.array(nodeOptionsSchema),
     network: networkOptionsSchema,
     peer: peerOptionsSchema,
     connectionTimeout: z
