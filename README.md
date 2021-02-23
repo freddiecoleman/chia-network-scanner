@@ -27,11 +27,13 @@ const chiaNetworkScanner = new ChiaNetworkScanner({
         softwareVersion: '0.2.2'
     },
 
-    // The first node to scan, you don't have to use localhost but it works if you are running a Chia node locally
-    node: {
-        hostname: 'localhost',
-        port: 8444,
-    },
+    startNodes: [{
+        hostname: 'sumo.chia.net',
+        port: 58444,
+    }, {
+        hostname: 'beast.chia.net',
+        port: 58444,
+    }],
 
     // Identifies this peer on the network
     peer: {
