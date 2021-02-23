@@ -183,7 +183,6 @@ const decodeRespondPeers = (message: Buffer) => {
     return { peer_list };
 }
 
-// TODO: needs to be replaced by non cbor version
 const decodeMessage = (data: Buffer): any => {
     let currentPos = 0;
 

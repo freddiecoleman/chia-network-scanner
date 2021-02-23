@@ -84,7 +84,7 @@ class ChiaNetworkScanner {
         // Set to visited immediately to prevent async processing of the same peer
         peer.visit();
 
-        // Opens a TCP connection with the peer we are processing
+        // Opens a websocket connection with the peer we are processing
         const peerConnection = new PeerConnection({
             networkId: network.networkId,
             protocolVersion: network.protocolVersion,
@@ -113,7 +113,7 @@ class ChiaNetworkScanner {
             // Enqueue peers of peer for async processing
             this.queue.push(peers);
 
-            // Close TCP connection
+            // Close websocket connection
             await peerConnection.close();
         } catch (err) {
             log.error(err);

@@ -115,7 +115,7 @@ class MessageChannel {
     }
 
     private onConnected(): void {
-        log.info(`Established TCP connection to Chia node ${this.hostname}:${this.port}`);
+        log.info(`Established websocket connection to Chia node ${this.hostname}:${this.port}`);
     }
 
     private onClose(err?: Error): void {
