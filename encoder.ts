@@ -1,9 +1,6 @@
 import { Peer } from './peer';
 import { log } from './log';
 
-// For now we will just try to keep up to date with the latest version. Should be easy as we do not implement the entire protocol.
-type ProtocolVersion = '0.0.29';
-
 const ProtocolMessageTypes = {
     handshake: 1,
     handshake_ack: 2,
@@ -13,7 +10,7 @@ const ProtocolMessageTypes = {
 
 interface Handshake {
     network_id: Buffer;
-    protocol_version: ProtocolVersion;
+    protocol_version: string;
     software_version: string;
     server_port: number;
     node_type: number;

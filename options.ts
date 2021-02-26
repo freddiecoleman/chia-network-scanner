@@ -1,8 +1,5 @@
 import * as z from 'zod';
 
-// For now we will just try to keep up to date with the latest version. Should be easy as we do not implement the entire protocol.
-type ProtocolVersion = '0.0.29';
-
 /**
  * Connection options for connecting to a full Chia node with the peer protocol.
  */
@@ -16,7 +13,7 @@ interface NodeOptions {
  */
 interface NetworkOptions {
     networkId: string;
-    protocolVersion: ProtocolVersion;
+    protocolVersion: string;
     softwareVersion: string;
 }
 
@@ -61,7 +58,7 @@ const networkOptionsSchema = z.object({
         .string()
         .min(64)
         .max(64),
-    protocolVersion: z.literal('0.0.29'),
+    protocolVersion: z.string(),
     softwareVersion: z.string()
 });
 
@@ -89,6 +86,5 @@ const parseOptions = (options: NetworkScannerOptions): NetworkScannerOptions => 
 
 export {
     NetworkScannerOptions,
-    ProtocolVersion,
     parseOptions
 };

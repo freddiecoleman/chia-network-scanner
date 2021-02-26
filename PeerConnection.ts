@@ -1,12 +1,11 @@
 import { log } from './log';
 import { MessageChannel } from './MessageChannel';
-import { ProtocolVersion } from './options';
 import { Peer } from './peer';
 import { decodeMessage, encodeMessage, ProtocolMessageTypes } from './encoder';
 
 interface PeerConnectionOptions {
     networkId: string;
-    protocolVersion: ProtocolVersion;
+    protocolVersion: string;
     softwareVersion: string;
     nodeType: number;
     hostname: string;

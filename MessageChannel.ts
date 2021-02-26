@@ -1,10 +1,9 @@
 import WebSocket from 'ws';
 import { log } from './log';
-import { ProtocolVersion } from './options';
 
 interface MessageChannelOptions {
     networkId: string;
-    protocolVersion: ProtocolVersion;
+    protocolVersion: string;
     softwareVersion: string;
     nodeType: number;
     hostname: string;
@@ -29,7 +28,7 @@ class MessageChannel {
     public readonly port: number;
     public readonly connectionTimeout: number;
     public readonly networkId: string;
-    public readonly protocolVersion: ProtocolVersion;
+    public readonly protocolVersion: string;
     public readonly softwareVersion: string;
     public readonly nodeType: number;
     public readonly cert: Buffer;
