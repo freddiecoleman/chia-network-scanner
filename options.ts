@@ -54,10 +54,7 @@ const nodeOptionsSchema = z.object({
 });
 
 const networkOptionsSchema = z.object({
-    networkId: z
-        .string()
-        .min(64)
-        .max(64),
+    networkId: z.string(),
     protocolVersion: z.string(),
     softwareVersion: z.string()
 });
