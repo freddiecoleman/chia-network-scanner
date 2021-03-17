@@ -9,7 +9,7 @@ const ProtocolMessageTypes = {
 };
 
 interface Handshake {
-    network_id: Buffer;
+    network_id: string;
     protocol_version: string;
     software_version: string;
     server_port: number;
@@ -24,11 +24,14 @@ const encodeHandshake = (handshake: Handshake): Buffer => {
     serverPortBuffer.writeUInt16BE(server_port);
 
     const message = Buffer.concat([
-        network_id,
+        encodeString(network_id),
         encodeString(protocol_version),
         encodeString(software_version),
         serverPortBuffer,
         Buffer.from([node_type]),
+        // todo: add capabilities here, a new thing! https://github.com/Chia-Network/chia-blockchain/blob/main/src/protocols/shared_protocol.py#L30
+        // for now just wacking some dummy ones on and seeing what happens
+        Buffer.from('0000000100010000000131', 'hex')
     ]);
 
     const messageLengthBuffer = Buffer.alloc(4);
@@ -37,11 +40,10 @@ const encodeHandshake = (handshake: Handshake): Buffer => {
 
     return Buffer.concat([
         Buffer.from([ProtocolMessageTypes.handshake]),
+        Buffer.from([0]), // Doing this to signal that id is not present
         messageLengthBuffer,
+        // message id apparently optional - maybe sometinh here is missing..? - at least need to be able to decode it right...?
         message,
-
-        // Full node adds this - guessing it means the end of the message
-        Buffer.from([0])
     ]);
 };
 
@@ -81,11 +83,9 @@ const encodeRespondPeers = (respondPeers: { peer_list: Peer[] }) => {
 
     return Buffer.concat([
         Buffer.from([ProtocolMessageTypes.respond_peers]),
+        Buffer.from([0]), // Doing this to signal that id is not present
         messageLengthBuffer,
         message,
-
-        // Full node adds this - guessing it means the end of the message
-        Buffer.from([0])
     ]);
 };
 
@@ -98,10 +98,8 @@ const encodeMessage = (messageType: number, data: any): Buffer => {
         
         return Buffer.concat([
             Buffer.from([messageType]),
+            Buffer.from([0]), // Doing this to signal that id is not present
             messageLengthBuffer,
-
-            // Full node adds this - guessing it means the end of the message
-            Buffer.from([0])
         ]);
     }
 
@@ -119,9 +117,9 @@ const encodeMessage = (messageType: number, data: any): Buffer => {
 const decodeHandshake = (message: Buffer) => {
     let currentPos = 0;
 
-    const network_id = message.slice(currentPos, currentPos + 32);
+    const network_id = decodeString(message.slice(currentPos));
 
-    currentPos += 32;
+    currentPos += 4 + network_id.length;
 
     const protocol_version = decodeString(message.slice(currentPos));
 
@@ -136,6 +134,8 @@ const decodeHandshake = (message: Buffer) => {
     currentPos += 2;
 
     const node_type = message[currentPos];
+
+    // Todo: there is also capabilities but it's not needed for now so not implementing it on decode
 
     return {
         network_id,
@@ -186,6 +186,17 @@ const decodeMessage = (data: Buffer): any => {
     const messageType = data[currentPos];
 
     currentPos++;
+
+    const isIdPresent = data[currentPos];
+
+    currentPos++
+
+    if (isIdPresent) {
+        // Id is present so we need to read another 16 bytes for now
+        // Not actually reading it for now as not planning on using it...
+        // could maybe use it later on....
+        currentPos += 2;
+    }
 
     const messageLength = data.readUInt32BE(currentPos);
 
