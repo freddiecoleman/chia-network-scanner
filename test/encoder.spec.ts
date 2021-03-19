@@ -24,25 +24,45 @@ describe('encoder', () => {
     describe('encodeMessage', () => {
         it('encodes handshake message', () => {
             const encodedHandshake = encodeMessage(1, {
-                network_id: 'testnet9',
+                network_id: 'mainnet',
                 protocol_version: '0.0.32',
-                software_version: '0.2.10.dev1',
-                server_port: 58444,
-                node_type: 1
+                software_version: '1.0.1',
+                server_port: 8444,
+                node_type: 1,
             });
 
+            // 01 00 0000002c 000000076d61696e6e657400000006302e302e333200000005312e302e3120fc010000000100010000000131
+
             // 01 - message type
-            // 00000036 - length of the rest of the message, ignoring the 00 at the end... must be part of how streamable works
-            // d4735e3a265e16eee03f59718b9b5d03019c07d8b6c51f90da3a666eec13ab35 = network_id = testnet
-            // 00000006 = length of protocol version (6)
-            // 302e302e3239 = protocol version = 0.0.29
-            // 00000005 = length of software version (5)
-            // 302e322e32 = software version - 0.2.2
-            // e44c = port = 58444
-            // 01 = node type = full node
-            // 0 = ???? must be to signal the end of the message
+
+            // 00 - optional and not present
+
+            // 0000002c - length of message - 44
+
+            // handshake message 00000007 6d61696e6e6574 00000006 302e302e3332 00000005 312e302e31 20fc 01 00000001 00010000000131
+
+            // length of network id = 7
+
+            // 6d61696e6e6574 - network id = mainnet
+
+            // 00000006 - length of protocol version - 6
+
+            // 302e302e3332 - protocol version = 0.0.32
+
+            // 00000005 length of software version - 5
+
+            // 312e302e31 -software version = 1.0.1
+
+            // 20fc - port - port = 8444
+
+            // 01 - node type = full node
+
+            // 00000001 - length of list of capabilities = 1
+
+            // 00010000000131 dunno lol
+
             expect(encodedHandshake.toString('hex')).toMatchInlineSnapshot(
-                `"01000000003300000008746573746e65743900000006302e302e33320000000b302e322e31302e64657631e44c010000000100010000000131"`
+                `"01000000002c000000076d61696e6e657400000006302e302e333200000005312e302e3120fc010000000100010000000131"`
             );
         });
 
@@ -91,48 +111,44 @@ describe('encoder', () => {
 
     describe('decodeMessages', () => {
         it('decodes handshake message', () => {
-            const encodedHandshake = Buffer.from('01000000003300000008746573746e65743900000006302e302e33320000000b302e322e31302e64657631e44c010000000100010000000131', 'hex');
+            const encodedHandshake = Buffer.from('01000000002c000000076d61696e6e657400000006302e302e333200000005312e302e3120fc010000000100010000000131', 'hex');
             const decodedHandshake = decodeMessage(encodedHandshake);
 
-            // latest rc9 - 01000000003300000008746573746e65743900000006302e302e33320000000b302e322e31302e64657631e44c010000000100010000000131
-            // 01 00 00000033 00000008746573746e65743900000006302e302e33320000000b302e322e31302e64657631e44c010000000100010000000131
+            // 01 00 0000002c 000000076d61696e6e657400000006302e302e333200000005312e302e3120fc010000000100010000000131
 
             // 01 - message type
 
-            // id is optional - For Optionals, there is a one byte prefix, 1 iff object is present, 0 iff not.
-            // 00 - optional and not present! 
+            // 00 - optional and not present
 
-            // 00000033 ?? - length of rest of message... 51 in decimal - i have manually confirmed that there are 51 bytes remaining to the end of the hex
+            // 0000002c - length of message - 44
 
-            // Full message containing handshake - 00000008746573746e65743900000006302e302e33320000000b302e322e31302e64657631e44c010000000100010000000131
+            // handshake message 00000007 6d61696e6e6574 00000006 302e302e3332 00000005 312e302e31 20fc 01 00000001 00010000000131
 
-            // 00000008 746573746e657439 00000006 302e302e3332 0000000b 302e322e31302e64657631 e44c 01 0000000100010000000131
+            // length of network id = 7
 
-            // 00000008 - length of network id string 8 in decimal
+            // 6d61696e6e6574 - network id = mainnet
 
-            // 746573746e657439 - the string testnet9
-
-            // 00000006 - length of protocol_version  6 in decimal
+            // 00000006 - length of protocol version - 6
 
             // 302e302e3332 - protocol version = 0.0.32
 
-            // 0000000b - length of software version 11 in decimal
+            // 00000005 length of software version - 5
 
-            // 302e322e31302e64657631 - software version = 0.2.10.dev1
+            // 312e302e31 -software version = 1.0.1
 
-            // e44c - server port 58444
+            // 20fc - port - port = 8444
 
             // 01 - node type = full node
 
-            // 00000001 - length of list of capabilities
+            // 00000001 - length of list of capabilities = 1
 
-            // 00010000000131 - capabilities ??
+            // 00010000000131 dunno lol
 
             expect(decodedHandshake).toEqual({
-                network_id: 'testnet9',
+                network_id: 'mainnet',
                 protocol_version: '0.0.32',
-                software_version: '0.2.10.dev1',
-                server_port: 58444,
+                software_version: '1.0.1',
+                server_port: 8444,
                 node_type: 1,
             });
         });
