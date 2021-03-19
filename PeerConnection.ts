@@ -72,10 +72,10 @@ class PeerConnection {
             const timeout = setTimeout(() => reject(new Error(`${hostname}:${port} did not respond to handshake within ${(connectionTimeout / 1000).toFixed(2)} seconds. Bailing.`)), connectionTimeout);
 
             // Handle handshake response messages
-            // const handshakeResponse = [
-            //     this.expectMessage(ProtocolMessageTypes.handshake),
-            //     this.expectMessage(ProtocolMessageTypes.handshake_ack)
-            // ];
+            const handshakeResponse = [
+                this.expectMessage(ProtocolMessageTypes.handshake),
+                this.expectMessage(ProtocolMessageTypes.handshake_ack)
+            ];
 
             // Initiate handshake
             this.sendMessage(ProtocolMessageTypes.handshake, {
@@ -86,12 +86,12 @@ class PeerConnection {
                 node_type: nodeType
             });
 
-            // try {
-            //     // Wait for handshake response
-            //     await Promise.race(handshakeResponse);
-            // } catch (err) {
-            //     return reject(err);
-            // }
+            try {
+                // Wait for handshake response
+                await Promise.race(handshakeResponse);
+            } catch (err) {
+                return reject(err);
+            }
 
             // Handshake completed within timeout
             clearTimeout(timeout);
