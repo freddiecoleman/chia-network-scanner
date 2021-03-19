@@ -141,7 +141,9 @@ class PeerConnection {
     private onMessage(data: Buffer): void {
         try {
             const messageType = data[0];
+            log.info(`Received message of type ${messageType}`);
             const message = decodeMessage(data);
+            log.info(`Decoded message to ${JSON.stringify(message)}`)
             const handler = this.messageHandlers.get(messageType);
 
             if (handler) {
