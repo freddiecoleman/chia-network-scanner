@@ -96,19 +96,31 @@ const encodeMessage = (messageType: number, data: any): Buffer => {
 
         messageLengthBuffer.writeUInt32BE(0);
         
-        return Buffer.concat([
+        const message = Buffer.concat([
             Buffer.from([messageType]),
             Buffer.from([0]), // Doing this to signal that id is not present
             messageLengthBuffer,
         ]);
+
+        log.info(`Encoded ${messageType} ${message.toString('hex')}`);
+
+        return message;
     }
 
     if (messageType === ProtocolMessageTypes.handshake) {
-        return encodeHandshake(data as Handshake);
+        const message = encodeHandshake(data as Handshake);
+
+        log.info(`Encoded handshake ${message.toString('hex')}`);
+
+        return message;
     }
 
     if (messageType === ProtocolMessageTypes.respond_peers) {
-        return encodeRespondPeers(data as { peer_list: Peer[] });
+        const message = encodeRespondPeers(data as { peer_list: Peer[] });
+
+        log.info(`Encoded respond peers ${message.toString('hex')}`);
+
+        return message;
     }
 
     throw new Error(`Could not encode message of type ${messageType}`);
