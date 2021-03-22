@@ -97,7 +97,11 @@ class MessageChannel {
         // Buffer is big enough to contain the length
         if (this.inboundDataBuffer.byteLength >= 5) {
             const messageType = data[0];
-            const messageLength = data.readUInt32BE(1);
+            const haveMessageId = data.readUInt8(1);
+            const messageLength = haveMessageId > 0 ?
+                data.readUInt32BE(4) :
+                data.readUInt32BE(2);
+
             const messageReady = data.byteLength === messageLength + 6;
             const bufferOverflow = data.byteLength > messageLength + 6;
 

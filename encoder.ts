@@ -4,8 +4,8 @@ import { log } from './log';
 const ProtocolMessageTypes = {
     handshake: 1,
     handshake_ack: 2,
-    request_peers: 40,
-    respond_peers: 41
+    request_peers: 43,
+    respond_peers: 44
 };
 
 interface Handshake {

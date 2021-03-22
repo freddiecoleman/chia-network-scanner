@@ -75,15 +75,15 @@ describe('encoder', () => {
         });
 
         it('encodes request_peers message', () => {
-            const encodedRequestPeers = encodeMessage(40, {});
+            const encodedRequestPeers = encodeMessage(43, {});
 
             expect(encodedRequestPeers.toString('hex')).toMatchInlineSnapshot(
-                `"280000000000"`
+                `"2b0000000000"`
             );
         });
 
         it('encodes respond_peers message', () => {
-            const encodedRespondPeers = encodeMessage(41, {
+            const encodedRespondPeers = encodeMessage(44, {
                 peer_list: [
                     new Peer({
                         hostname: 'localhost',
@@ -104,7 +104,7 @@ describe('encoder', () => {
             });
 
             expect(encodedRespondPeers.toString('hex')).toMatchInlineSnapshot(
-                `"29000000004d00000003000000096c6f63616c686f7374e44c00000000000030390000000d73756d6f2e636869612e6e6574e44c000000000098967f000000093132372e302e302e32e44c00000000000f1206"`
+                `"2c000000004d00000003000000096c6f63616c686f7374e44c00000000000030390000000d73756d6f2e636869612e6e6574e44c000000000098967f000000093132372e302e302e32e44c00000000000f1206"`
             );
         });
     });
@@ -161,14 +161,14 @@ describe('encoder', () => {
         });
 
         it('decodes request_peers message', () => {
-            const encodedRequestPeers = encodeMessage(40, {});
+            const encodedRequestPeers = encodeMessage(43, {});
             const decodedRequestPeers = decodeMessage(encodedRequestPeers);
 
             expect(decodedRequestPeers).toEqual({});
         });
 
         it('decodes respond_peers message', () => {
-            const encodedRespondPeers = encodeMessage(41, {
+            const encodedRespondPeers = encodeMessage(44, {
                 peer_list: [
                     new Peer({
                         hostname: 'localhost',
