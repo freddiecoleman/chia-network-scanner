@@ -101,14 +101,14 @@ class ChiaNetworkScanner {
 
         try {
              // Establish websocket connection
-            await peerConnection.connect();
+            const nodeId = await peerConnection.connect();
 
             peerLogger.info('Websocket connection established');
 
             // Performs application level handshake with peer
             await peerConnection.handshake();
 
-            const peers = await peerConnection.getPeers();
+            const peers = await peerConnection.getPeers(nodeId);
 
             // Enqueue peers of peer for async processing
             this.queue.push(peers);

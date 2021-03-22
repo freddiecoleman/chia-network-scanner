@@ -1,3 +1,4 @@
+import tls from 'tls';
 import WebSocket from 'ws';
 import { log } from './log';
 
@@ -24,6 +25,7 @@ class MessageChannel {
     private readonly onMessage: (message: Buffer) => void;
     private ws: WebSocket | null = null;
     private inboundDataBuffer: Buffer = Buffer.from([]);
+    private nodeId: string = '';
     public readonly hostname: string;
     public readonly port: number;
     public readonly connectionTimeout: number;
@@ -58,7 +60,7 @@ class MessageChannel {
         this.key = key;
     }
 
-    public async connect(): Promise<void> {
+    public async connect(): Promise<string> {
         return new Promise(resolve => {
             log.info(`Attempting websocket connection to wss://${this.hostname}:${this.port}/ws`);
 
@@ -67,18 +69,31 @@ class MessageChannel {
                 `wss://[${this.hostname}]:${this.port}/ws` :
                 `wss://${this.hostname}:${this.port}/ws`;
 
-            this.ws = new WebSocket(url, {
-                rejectUnauthorized: false,
+            // Using lower level lib to get the x509 cert fingerprint in order to detect unique peers
+            const socket = tls.connect(this.port, this.hostname, {
                 cert: this.cert,
-                key: this.key
-            });
-            this.ws.on('message', (data: Buffer): void => this.messageHandler(data));
-            this.ws.on('error', (err: Error): void => this.onClose(err));
-            this.ws.on('close', (_, reason) => this.onClose(new Error(reason)));
-            this.ws.on('open', () => {
-                this.onConnected();
+                key: this.key,
+                rejectUnauthorized: false
+            }, () => {
+                const x509Cert = socket.getPeerCertificate(false);
 
-                resolve();
+                const nodeId = x509Cert.fingerprint256.replace(':', '');
+
+                socket.end();
+
+                this.ws = new WebSocket(url, {
+                    rejectUnauthorized: false,
+                    cert: this.cert,
+                    key: this.key
+                });
+                this.ws.on('message', (data: Buffer): void => this.messageHandler(data));
+                this.ws.on('error', (err: Error): void => this.onClose(err));
+                this.ws.on('close', (_, reason) => this.onClose(new Error(reason)));
+                this.ws.on('open', () => {
+                    this.onConnected();
+    
+                    resolve(nodeId);
+                });
             });
         });
     }
