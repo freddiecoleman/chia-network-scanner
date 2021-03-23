@@ -84,6 +84,12 @@ class ChiaNetworkScanner {
         if (peer.visited) {
             peerLogger.debug('Skipping already visited peer');
 
+            if (proposedPeer.timestamp > peer.timestamp) {
+                log.debug(`Updating visited peer ${proposedPeer.hostname}:${proposedPeer.port} to more recent timestamp`);
+
+                this.peers.set(peerHash, proposedPeer);
+            }
+
             return;
         }
 
