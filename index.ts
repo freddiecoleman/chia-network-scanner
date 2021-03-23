@@ -60,6 +60,14 @@ class ChiaNetworkScanner {
         const peerLogger = log.child({
             ...proposedPeer
         });
+
+        const ipv6 = proposedPeer.hostname.includes(':');
+
+        // Only scan ipv4 because ipv6 nodes can appear with both their ipv4 address and their ipv6 address
+        if (ipv6) {
+            return;
+        }
+
         const { connectionTimeout, network, peer: peerOptions, certPath, keyPath } = this.options;
         const peerHash = proposedPeer.hash();
 
