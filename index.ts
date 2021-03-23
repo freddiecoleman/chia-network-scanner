@@ -87,6 +87,8 @@ class ChiaNetworkScanner {
             if (proposedPeer.timestamp > peer.timestamp) {
                 peerLogger.debug(`Updating visited peer to more recent timestamp`);
 
+                proposedPeer.visit();
+
                 this.peers.set(peerHash, proposedPeer);
             }
 
